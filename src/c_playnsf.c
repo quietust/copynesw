@@ -112,14 +112,13 @@ BOOL	LoadNSF (char *filename)
 		CloseStatus();
 		return FALSE;
 	}
-	nbytes++;
 	fseek(NSF,128,SEEK_SET);
 	nblks = nbytes / 4096;
 	nrem = nbytes % 4096;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!WriteByte(NSF_banks[i] = header[0x70 | i]));
+		if (!WriteByte(NSF_banks[i] = header[0x70 | i]))
 		{
 			CloseStatus();
 			return FALSE;
