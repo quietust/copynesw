@@ -12,7 +12,7 @@ TCHAR szWindowClass[MAX_LOADSTRING];						// The title bar text
 // Foward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	CopyNES_Menu(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	CopyNES_Menu(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -172,7 +172,7 @@ void	EnableMenus (HWND hDlg)
 	}
 }
 
-LRESULT CALLBACK CopyNES_Menu(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK CopyNES_Menu(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL success = TRUE;
 	switch (message)

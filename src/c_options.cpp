@@ -24,10 +24,10 @@ static	void	PromptForDirectory (HWND hDlg, const char *pathvar, int dlgitem)
 	if (!SHGetPathFromIDList(idlist,dirName))
 		return;
 	SetDlgItemText(hDlg,dlgitem,dirName);
-	pMalloc->lpVtbl->Free(pMalloc,idlist);
-	pMalloc->lpVtbl->Release(pMalloc);	
+	pMalloc->Free(idlist);
+	pMalloc->Release();	
 }
-static	LRESULT CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char tmpstr[16];
 	int newPort, newAddr;

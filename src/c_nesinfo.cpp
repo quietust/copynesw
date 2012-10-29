@@ -22,7 +22,7 @@ BOOL	CMD_NESINFO (void)
 
 	for (i = 0; i < 256; i++)
 	{
-		if (!ReadByteEx(&Version[i],1,FALSE))
+		if (!ReadByteEx((BYTE*)&Version[i],1,FALSE))
 		{
 			StatusText("Error reading version string!");
 			StatusOK();

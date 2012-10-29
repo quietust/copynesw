@@ -150,7 +150,7 @@ void	SelectInstrument (HWND hDlg, int newinst)
 	SetDlgItemInt(hDlg, IDC_VRC7_INSTEDIT, inst, FALSE);
 }
 
-LRESULT CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i, j;
 	switch (message)

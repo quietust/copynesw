@@ -138,85 +138,85 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\src\c_bankwatch.c">
+				RelativePath="..\src\c_bankwatch.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_breakbank.c">
+				RelativePath="..\src\c_breakbank.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_disasm.c">
+				RelativePath="..\src\c_disasm.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_dumpcart.c">
+				RelativePath="..\src\c_dumpcart.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_fixgar.c">
+				RelativePath="..\src\c_fixgar.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_makenes.c">
+				RelativePath="..\src\c_makenes.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_makeunif.c">
+				RelativePath="..\src\c_makeunif.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_microbug.c">
+				RelativePath="..\src\c_microbug.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_nesinfo.c">
+				RelativePath="..\src\c_nesinfo.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_options.c">
+				RelativePath="..\src\c_options.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_playcart.c">
+				RelativePath="..\src\c_playcart.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_playnsf.c">
+				RelativePath="..\src\c_playnsf.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_ramcart.c">
+				RelativePath="..\src\c_ramcart.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_regplay.c">
+				RelativePath="..\src\c_regplay.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_runplug.c">
+				RelativePath="..\src\c_runplug.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_splitnes.c">
+				RelativePath="..\src\c_splitnes.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_splitunif.c">
+				RelativePath="..\src\c_splitunif.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_vrc7regs.c">
+				RelativePath="..\src\c_vrc7regs.cpp">
 			</File>
 			<File
-				RelativePath="..\src\c_writewram.c">
+				RelativePath="..\src\c_writewram.cpp">
 			</File>
 			<File
-				RelativePath="..\src\config.c">
+				RelativePath="..\src\config.cpp">
 			</File>
 			<File
-				RelativePath="..\src\CopyNESW.c">
+				RelativePath="..\src\CopyNESW.cpp">
 			</File>
 			<File
-				RelativePath="..\src\crc32.c">
+				RelativePath="..\src\crc32.cpp">
 			</File>
 			<File
-				RelativePath="..\src\inpout32drv.c">
+				RelativePath="..\src\inpout32drv.cpp">
 			</File>
 			<File
-				RelativePath="..\src\io.c">
+				RelativePath="..\src\io.cpp">
 			</File>
 			<File
-				RelativePath="..\src\misc.c">
+				RelativePath="..\src\misc.cpp">
 			</File>
 			<File
-				RelativePath="..\src\miscdialogs.c">
+				RelativePath="..\src\miscdialogs.cpp">
 			</File>
 			<File
-				RelativePath="..\src\StdAfx.c">
+				RelativePath="..\src\StdAfx.cpp">
 			</File>
 		</Filter>
 		<Filter

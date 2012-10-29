@@ -192,7 +192,7 @@ void	RedrawBanks (void)
 			sprintf(crc,"%02X%02X%02X%02X",PRGbuffer[i][0],PRGbuffer[i][1],PRGbuffer[i][2],PRGbuffer[i][3]);
 			TextOut(BankDC, 11*W+256, i*H, crc, 8);
 		}
-		else	TextOut(BankDC, 11*W+256, i*H, PRGbuffer[i], 32);
+		else	TextOut(BankDC, 11*W+256, i*H, (char *)PRGbuffer[i], 32);
 		if (!BigBanks)
 			i++;
 	}
@@ -259,7 +259,7 @@ void	GetBanks (void)
 	RedrawBanks();
 }
 
-LRESULT CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	POINT wcl = {0, 0}, fontsize = {FONT_WIDTH, FONT_HEIGHT};
 	RECT rect;

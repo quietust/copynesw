@@ -61,8 +61,8 @@ BOOL	CMD_SPLITUNIF (void)
 		}
 		else if (!memcmp(buf,"MAPR",4))
 		{
-			char *msg = malloc(len + 16);
-			char *board = malloc(len);
+			char *msg = (char *)malloc(len + 16);
+			char *board = (char *)malloc(len);
 			fread(board,1,len,UNIF);
 			sprintf(msg,"Board name: %s",board);
 			free(board);

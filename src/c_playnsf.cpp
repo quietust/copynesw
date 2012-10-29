@@ -5,7 +5,7 @@ static	char	NSF_name[33], NSF_artist[33], NSF_copyright[33];
 static	BYTE	NSF_banks[8]; 
 static	BYTE	NSF_cursong, NSF_totalsongs;
 
-LRESULT CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i;
 	switch (message)

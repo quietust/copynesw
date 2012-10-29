@@ -39,7 +39,7 @@ BOOL	SplitIt (char *infile, char *filename)
 		return FALSE;
 	}
 	fread(buf,1,16,NES);
-	if (strncmp(buf,"NES\x1A",4))
+	if (strncmp((char *)buf,"NES\x1A",4))
 	{
 		MessageBox(topHWnd,"File is not a valid iNES ROM image!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
 		fclose(NES);

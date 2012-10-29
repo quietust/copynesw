@@ -197,15 +197,15 @@ BOOL	Startup	(void)
 
 	fscanf(PlugList,"%i %i %i %i %i %i\n", &i, &col0, &col1, &col2, &col3, &col4);
 	col0--; col1--; col2--; col3--; col4--;
-	C1 = malloc(col1 - col0 + 1);	C1[col1 - col0] = 0;
-	C2 = malloc(col2 - col1 + 1);	C2[col2 - col1] = 0;
-	C3 = malloc(col3 - col2 + 1);	C3[col3 - col2] = 0;
-	C4 = malloc(col4 - col3 + 1);	C4[col4 - col3] = 0;
-	Data = malloc(col4);
+	C1 = (char *)malloc(col1 - col0 + 1);	C1[col1 - col0] = 0;
+	C2 = (char *)malloc(col2 - col1 + 1);	C2[col2 - col1] = 0;
+	C3 = (char *)malloc(col3 - col2 + 1);	C3[col3 - col2] = 0;
+	C4 = (char *)malloc(col4 - col3 + 1);	C4[col4 - col3] = 0;
+	Data = (char *)malloc(col4);
 
 	numcats = (i / 4) - 7;
 
-	Plugins = malloc(numcats * sizeof(PCategory));
+	Plugins = (PCategory *)malloc(numcats * sizeof(PCategory));
 	memset(Plugins, 0, numcats * sizeof(PCategory));
 
 	// step 2 - count how many plugins are in each category
@@ -250,7 +250,7 @@ BOOL	Startup	(void)
 		}
 		else
 		{
-			Plugins[j]->list[i] = malloc(sizeof(TPlugin));
+			Plugins[j]->list[i] = (PPlugin)malloc(sizeof(TPlugin));
 			Plugins[j]->list[i]->name = strdup(C1);
 			Plugins[j]->list[i]->file = strdup(C2);
 			Plugins[j]->list[i]->num = atoi(C3);
@@ -268,7 +268,7 @@ BOOL	Startup	(void)
 
 	// RAMCART - create new category for upload plugins
 	numcats++;
-	Plugins = realloc(Plugins, numcats * sizeof(PCategory));	// allocate another slot
+	Plugins = (PCategory *)realloc(Plugins, numcats * sizeof(PCategory));	// allocate another slot
 	memset(&Plugins[numcats-1], 0, sizeof(PCategory));		// clear the new one at the end
 
 	i = numcats - 2;						// and then populate the one 2nd from the end
@@ -279,19 +279,19 @@ BOOL	Startup	(void)
 	Plugins[i]->type = PLUG_UPLOAD;
 	Plugins[i]->desc = strdup("RAM/Flash cartridge programmer");
 
-	Plugins[i]->list[0] = malloc(sizeof(TPlugin));
+	Plugins[i]->list[0] = (PPlugin)malloc(sizeof(TPlugin));
 	Plugins[i]->list[0]->name = strdup("NRAM");
 	Plugins[i]->list[0]->file = strdup("ram.bin");
 	Plugins[i]->list[0]->num = 0;
 	Plugins[i]->list[0]->desc = strdup("NROM cart with 32K RAM for PRG and 8K RAM for CHR");
 
-	Plugins[i]->list[1] = malloc(sizeof(TPlugin));
+	Plugins[i]->list[1] = (PPlugin)malloc(sizeof(TPlugin));
 	Plugins[i]->list[1]->name = strdup("CNRAM");
 	Plugins[i]->list[1]->file = strdup("cnram.bin");
 	Plugins[i]->list[1]->num = 1;
 	Plugins[i]->list[1]->desc = strdup("CNROM cart with 32K of PRG and CHR RAM");
 
-	Plugins[i]->list[2] = malloc(sizeof(TPlugin));
+	Plugins[i]->list[2] = (PPlugin)malloc(sizeof(TPlugin));
 	Plugins[i]->list[2]->name = strdup("UfROM");
 	Plugins[i]->list[2]->file = strdup("uxram.bin");
 	Plugins[i]->list[2]->num = 2;
@@ -309,7 +309,7 @@ BOOL	Startup	(void)
 	return TRUE;
 }
 
-void	Shutdown (void)
+BOOL	Shutdown (void)
 {
 	int i, j;
 	if (Plugins)
@@ -329,4 +329,5 @@ void	Shutdown (void)
 		free(Plugins);
 	}
 	ClosePort();
+	return TRUE;
 }

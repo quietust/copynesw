@@ -365,7 +365,7 @@ int	GetRegister (void)
 	return n;
 }
 
-LRESULT CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i;
 	char txt[256];

@@ -3,7 +3,7 @@
 
 /* Status dialog */
 static	BOOL StatButton;
-LRESULT CALLBACK DLG_Status (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_Status (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -130,7 +130,7 @@ void	StatusOK (void)
 
 char	*PromptTitle;
 char	PromptResult[1024];
-LRESULT CALLBACK DLG_Prompt(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_Prompt(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -205,7 +205,7 @@ BOOL	PromptFile (HWND hWnd, char *Filter, char *FilePath, char *FileName, char *
 
 /* Board Name Prompt */
 
-LRESULT CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static int curcat = 0, curplug = 0;
 	static int lastcat = 0, lastplug = 0;
