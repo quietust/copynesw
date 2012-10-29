@@ -79,9 +79,11 @@ void	GetConfig (void)
 	ParPort = GetPrivateProfileInt("CopyNES","ParPort",0,Config);
 	GetPrivateProfileString("CopyNES","ParAddr","0",tmpstr,16,Config);
 	sscanf(tmpstr,"%X",&ParAddr);
+	GetPrivateProfileString("CopyNES","ParECP","0",tmpstr,16,Config);
+	sscanf(tmpstr,"%X",&ParECP);
 	if ((ParAddr == 0) && (ParPort > 0))
 	{
-		// config update stuff
+		// update old config data
 		if (ParPort == 1)
 			ParAddr = 0x378;
 		if (ParPort == 2)
@@ -96,6 +98,11 @@ void	GetConfig (void)
 			ParAddr = 0xE800;
 		if (ParPort > 4)
 			ParPort = 4;
+		WriteConfig();
+	}
+	if ((ParAddr > 0) && (ParECP == 0))
+	{
+		ParECP = 0x400;
 		WriteConfig();
 	}
 }
@@ -119,6 +126,8 @@ void	WriteConfig (void)
 	WritePrivateProfileString("CopyNES","ParPort",tmpstr,Config);
 	sprintf(tmpstr,"%X",ParAddr);
 	WritePrivateProfileString("CopyNES","ParAddr",tmpstr,Config);
+	sprintf(tmpstr,"%X",ParECP);
+	WritePrivateProfileString("CopyNES","ParECP",tmpstr,Config);
 }
 
 int	FindVersion (void)
