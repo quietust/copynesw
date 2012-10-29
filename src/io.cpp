@@ -358,6 +358,7 @@ BOOL	LoadPlugin (char *plugin)
 	int w;
 	char filename[MAX_PATH];
 	FILE *PLUGIN;
+
 	strcpy(filename,Path_PLUG);
 	strcat(filename,plugin);
 	if ((PLUGIN = fopen(filename,"rb")) == NULL)

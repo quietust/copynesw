@@ -38,11 +38,11 @@ BOOL	UploadGAR (void)
 	StatusText("Running upload plugin...");
 	RunCode();
 	StatusText("Uploading from data file...");
+	BYTE a[256];
 	for (i = 0; i < 8; i++)
 	{
-		BYTE filedata[256];
-		fread(&filedata,256,1,GAR);
-		if (!WriteBlock(filedata, 1024))
+		fread(&a,256,1,GAR);
+		if (!WriteBlock(a, 256))
 		{
 			fclose(GAR);
 			CloseStatus();

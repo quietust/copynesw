@@ -496,12 +496,12 @@ BOOL	PowerPakLitecart (char *plugin)
 	}
 	fseek(NES,0x10,SEEK_SET);
 
-	BYTE filedata[1024];
+	BYTE a[1024];
 
 	for (i = 0; i < header[4] * 16; i++)
 	{
-		fread(filedata, 1024, 1, NES);
-		if (!WriteBlock(filedata, 1024))
+		fread(a, 1024, 1, NES);
+		if (!WriteBlock(a, 1024))
 		{
 			CloseStatus();
 			fclose(NES);
@@ -523,8 +523,8 @@ BOOL	PowerPakLitecart (char *plugin)
 
 	for (i = 0; i < header[5] * 8; i++)
 	{
-		fread(filedata, 1024, 1, NES);
-		if (!WriteBlock(filedata, 1024))
+		fread(a, 1024, 1, NES);
+		if (!WriteBlock(a, 1024))
 		{
 			CloseStatus();
 			fclose(NES);
@@ -662,7 +662,7 @@ BOOL	PowerPakcart (char *plugin)
 
 	StatusText("Sending PRG data...");
 
-	BYTE filedata[1024];
+	BYTE a[1024];
 
 	// 64KB of data, written 4 times in a row
 	for (i=0; i<4; i++)
@@ -670,10 +670,9 @@ BOOL	PowerPakcart (char *plugin)
 		fseek(NES,0x10,SEEK_SET); // go to start of prg
 		for (j=0; j<64; j++)
 		{
-			fread(filedata, 1024, 1, NES);
-			if (!WriteBlock(filedata, 1024))
+			fread(a, 1024, 1, NES);
+			if (!WriteBlock(a, 1024))
 			{
-				free(filedata);
 				CloseStatus();
 				fclose(NES);
 				return FALSE;
@@ -685,8 +684,6 @@ BOOL	PowerPakcart (char *plugin)
 	StatusPercent(100);
 	StatusText("...done!"); 
 	fclose(NES);
-	free(filedata);
-
 
 	if (!ReadByte(&banks))
 	{
@@ -789,18 +786,17 @@ BOOL	Glidercart (char *plugin)
 
 	StatusText("Sending PRG data...");
 
-	BYTE filedata[1024];
+	BYTE a[1024];
 
 	for (i=0; i<4; i++)
 	{
 		fseek(NES,0x10,SEEK_SET);  //go to start of prg
 		for (j=0; j<64; j++)
 		{
-			fread(filedata, 1024, 1, NES);  //write 64KB
+			fread(a, 1024, 1, NES);  //write 64KB
 
-			if (!WriteBlock(filedata, 1024))
+			if (!WriteBlock(a, 1024))
 			{
-				free(filedata);
 				CloseStatus();
 				fclose(NES);
 				return FALSE;
@@ -812,7 +808,6 @@ BOOL	Glidercart (char *plugin)
 	StatusPercent(100);
 	StatusText("...done!"); 
 	fclose(NES);
-	free(filedata);
 
 	if (!ReadByte(&banks))
 	{

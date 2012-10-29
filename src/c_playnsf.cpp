@@ -28,7 +28,9 @@ INT_PTR CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 			if (NSF_cursong < 1)
 				NSF_cursong = NSF_totalsongs;
 			SetDlgItemInt(hDlg,IDC_NSF_CURSONG,NSF_cursong,FALSE);
+			// counteract the following increment...
 			NSF_cursong--;
+			// ...and fall through
 		case IDC_NSF_NEXT:
 			NSF_cursong++;
 			if (NSF_cursong > NSF_totalsongs)
