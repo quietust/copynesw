@@ -309,8 +309,6 @@ BOOL	CMD_VRC7REGS (void)
 			fread(&instdata[i][j],1,1,data);
 
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");

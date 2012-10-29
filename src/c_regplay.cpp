@@ -6,8 +6,6 @@ BOOL	RegPlayNES (char *filename)
 	int FrameNum = 0, NumFrames = 0;
 	FILE *REGDATA;
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -73,8 +71,6 @@ BOOL	RegPlayVRC7 (char *filename)
 	int FrameNum = 0, NumFrames = 0;
 	FILE *REGDATA;
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");

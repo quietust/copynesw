@@ -29,6 +29,7 @@
 #include <time.h>
 #include "CopyNESW.h"
 #include "resource.h"
+#include "ftd2xx.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

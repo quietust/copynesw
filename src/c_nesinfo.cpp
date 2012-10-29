@@ -8,9 +8,18 @@ BOOL	CMD_NESINFO (void)
 	OpenStatus(topHWnd);
 	if (HWVer == 1)
 	{
-		StatusText("CopyNES did not return a version reply, assuming version 1");
-		StatusOK();
-		return TRUE;
+		if (ParPort == -1)
+		{
+			StatusText("CopyNES did not return a version reply!");
+			StatusOK();
+			return FALSE;
+		}
+		else
+		{
+			StatusText("CopyNES did not return a version reply, assuming version 1");
+			StatusOK();
+			return TRUE;
+		}
 	}
 	StatusText("Retrieving internal version string...");
 	if (!WriteByteEx(0xA1,3,FALSE))

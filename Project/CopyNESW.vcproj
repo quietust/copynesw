@@ -177,6 +177,9 @@
 				RelativePath="..\src\c_ramcart.cpp">
 			</File>
 			<File
+				RelativePath="..\src\c_reconnect.cpp">
+			</File>
+			<File
 				RelativePath="..\src\c_regplay.cpp">
 			</File>
 			<File

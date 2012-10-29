@@ -85,6 +85,7 @@ BOOL	CMD_FIXGAR (void);
 BOOL	CMD_BANKWATCH (void);
 BOOL	CMD_MICROBUG (void);
 BOOL	CMD_VRC7REGS (void);
+BOOL	CMD_RECONNECT (void);
 
 void	EnableMenus (HWND hDlg)
 {
@@ -113,6 +114,7 @@ void	EnableMenus (HWND hDlg)
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_BANKWATCH),FALSE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_MICROBUG),FALSE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_VRC7REGS),FALSE);
+		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_RECONNECT),FALSE);
 		// disable all "online" options
 	}
 	else if (HWVer == 1)
@@ -140,6 +142,7 @@ void	EnableMenus (HWND hDlg)
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_BANKWATCH),TRUE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_MICROBUG),FALSE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_VRC7REGS),TRUE);
+		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_RECONNECT),TRUE);
 	}
 	else
 	{	// enable everything
@@ -166,9 +169,14 @@ void	EnableMenus (HWND hDlg)
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_BANKWATCH),TRUE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_MICROBUG),TRUE);
 		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_VRC7REGS),TRUE);
+		EnableWindow(GetDlgItem(hDlg,IDC_MAIN_RECONNECT),TRUE);
 
-		if (HWVer > 3)
+		if ((ParPort != -1) && (HWVer > 3))
 			MessageBox(topHWnd,"Unrecognized CopyNES BIOS version detected!\nPlease check for an updated version of the client software!", "CopyNES", MB_OK | MB_ICONERROR);
+		if ((ParPort == -1) && (HWVer < 4))
+			MessageBox(topHWnd,"Unrecognized USB CopyNES BIOS version detected!\nPlease check for an updated version of the client software!", "CopyNES", MB_OK | MB_ICONERROR);
+		if (HWVer == 255)
+			MessageBox(topHWnd,"CopyNES connection failed! Try reconnecting.", "CopyNES", MB_OK | MB_ICONERROR);
 	}
 }
 
@@ -213,6 +221,7 @@ INT_PTR CALLBACK CopyNES_Menu(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 		case IDC_MAIN_BANKWATCH:	success = CMD_BANKWATCH();	break;
 		case IDC_MAIN_MICROBUG:		success = CMD_MICROBUG();	break;
 		case IDC_MAIN_VRC7REGS:		success = CMD_VRC7REGS();	break;
+		case IDC_MAIN_RECONNECT:	success = CMD_RECONNECT();	break;
 		}
 		if (!success)
 			MessageBox(topHWnd,"An error occurred during the previous operation!","CopyNESW",MB_OK | MB_ICONERROR);

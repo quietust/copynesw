@@ -36,7 +36,6 @@ INT_PTR CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 			SetDlgItemInt(hDlg,IDC_NSF_CURSONG,NSF_cursong,FALSE);
 		case IDC_NSF_REPLAY:
 	/* FIXME: find out why this code breaks after running once */
-			InitPort();
 			ResetNES(RESET_COPYMODE);
 			if (!WriteByte(0x9F))	// Play NSF
 			{
@@ -81,8 +80,6 @@ BOOL	LoadNSF (char *filename)
 	}
 
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 
@@ -113,8 +110,8 @@ BOOL	LoadNSF (char *filename)
 		return FALSE;
 	}
 	fseek(NSF,128,SEEK_SET);
-	nblks = nbytes / 4096;
-	nrem = nbytes % 4096;
+	nblks = nbytes / 1024;
+	nrem = nbytes % 1024;
 
 	for (i = 0; i < 8; i++)
 	{
@@ -131,46 +128,38 @@ BOOL	LoadNSF (char *filename)
 	}
 
 	StatusText("Uploading NSF data...");
+	BYTE r[1024];
 	if (nblks)
 	{
 		int v, a;
 		for (v = 0; v < nblks; v++)
 		{
-			for (a = 0; a < 4096; a++)
+			if (fread(&r,1024,1,NSF) == 0)
 			{
-				BYTE r;
-				if (fread(&r,1,1,NSF) == 0)
-				{
-					MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK);
-					CloseStatus();
-					return FALSE;
-				}
-				if (!WriteByte(r))
-				{
-					CloseStatus();
-					return FALSE;
-				}
+				MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK);
+				CloseStatus();
+				return FALSE;
+			}
+			if (!WriteBlock(r, 1024))
+			{
+				CloseStatus();
+				return FALSE;
 			}
 			StatusPercent(v*100/nblks);
 		}
 	}
 	if (nrem)
 	{
-		int a;
-		for (a = 0; a < nrem; a++)
+		if (fread(&r,nrem,1,NSF) == 0)
 		{
-			BYTE r;
-			if (fread(&r,1,1,NSF) == 0)
-			{
-				StatusText("Error! Failed to read NSF data!");
-				StatusOK();
-				return FALSE;
-			}
-			if (!WriteByte(r))
-			{
-				CloseStatus();
-				return FALSE;
-			}
+			MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK);
+			CloseStatus();
+			return FALSE;
+		}
+		if (!WriteBlock(r, nrem))
+		{
+			CloseStatus();
+			return FALSE;
 		}
 		StatusPercent(100);
 	}

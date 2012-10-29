@@ -26,8 +26,6 @@ BOOL	CMD_DUMPCART (void)
 	strcpy(filename,PromptResult);
 
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 
@@ -161,7 +159,8 @@ BOOL	CMD_DUMPCART (void)
 		if (plugin->num == 999)
 			return TRUE;
 		WriteNES(filename,plugin->num,battery,mirror,scrn4);
-		WriteUNIF(filename,plugin->name,battery,mirror,scrn4,mcon);
+		if (MakeUNIF)
+			WriteUNIF(filename,plugin->name,battery,mirror,scrn4,mcon);
 		if (SaveFiles == 0)
 		{
 			unlink(strjoin3(fnamebuf,Path_CHR,filename,".chr"));

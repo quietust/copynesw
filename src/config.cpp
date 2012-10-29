@@ -3,7 +3,7 @@
 
 int	HWVer;
 int	ParPort, ParAddr, ParECP;
-BOOL	SaveCRC, SaveFiles;
+BOOL	SaveCRC, SaveFiles, MakeUNIF;
 char	Path_MAIN[MAX_PATH], Path_PRG[MAX_PATH], Path_CHR[MAX_PATH], Path_WRAM[MAX_PATH],
 	Path_NES[MAX_PATH], Path_CRC[MAX_PATH], Path_NSF[MAX_PATH], Path_PLUG[MAX_PATH];
 
@@ -62,6 +62,7 @@ void	GetConfig (void)
 	strcat(Config,"CopyNESW.ini");
 	SaveCRC = GetPrivateProfileInt("CopyNES","SaveCRC",0,Config);
 	SaveFiles = GetPrivateProfileInt("CopyNES","SaveFiles",0,Config);
+	MakeUNIF = GetPrivateProfileInt("CopyNES","MakeUNIF",0,Config);
 	GetPrivateProfileString("CopyNES","PRGPath","Parts",Path_PRG,MAX_PATH,Config);
 	GetPrivateProfileString("CopyNES","CHRPath","Parts",Path_CHR,MAX_PATH,Config);
 	GetPrivateProfileString("CopyNES","WRAMPath","Finished",Path_WRAM,MAX_PATH,Config);
@@ -81,7 +82,7 @@ void	GetConfig (void)
 	sscanf(tmpstr,"%X",&ParAddr);
 	GetPrivateProfileString("CopyNES","ParECP","0",tmpstr,16,Config);
 	sscanf(tmpstr,"%X",&ParECP);
-	if ((ParAddr == 0) && (ParPort > 0))
+	if ((ParPort > 0) && (ParAddr == 0))
 	{
 		// update old config data
 		if (ParPort == 1)
@@ -115,6 +116,8 @@ void	WriteConfig (void)
 	WritePrivateProfileString("CopyNES","SaveCRC",tmpstr,Config);
 	sprintf(tmpstr,"%i",SaveFiles);
 	WritePrivateProfileString("CopyNES","SaveFiles",tmpstr,Config);
+	sprintf(tmpstr,"%i",WriteUNIF);
+	WritePrivateProfileString("CopyNES","WriteUNIF",tmpstr,Config);
 	WritePrivateProfileString("CopyNES","PRGPath",_relpath(strcpy(tmpdir,Path_PRG),Path_MAIN),Config);
 	WritePrivateProfileString("CopyNES","CHRPath",_relpath(strcpy(tmpdir,Path_CHR),Path_MAIN),Config);
 	WritePrivateProfileString("CopyNES","WRAMPath",_relpath(strcpy(tmpdir,Path_WRAM),Path_MAIN),Config);
@@ -133,7 +136,7 @@ void	WriteConfig (void)
 int	FindVersion (void)
 {
 	BYTE i;
-        OpenStatus(topHWnd);
+	OpenStatus(topHWnd);
 	StatusText("Querying CopyNES BIOS version...");
 	if (!WriteByteEx(0xA2,3,FALSE))
 	{
@@ -145,14 +148,23 @@ int	FindVersion (void)
 	StatusText("Waiting for reply...");
 	if (!ReadByteEx(&i,3,FALSE))
 	{
-		StatusText("Version reply not received! Assuming version 1 BIOS.");
-		Sleep(SLEEP_LONG);
-		CloseStatus();
-		InitPort();
-		ResetNES(RESET_COPYMODE);
-		return 1;
+		if (ParPort == -1)
+		{
+			StatusText("Version reply not received!");
+			StatusText("Make sure your CopyNES is connected and turned on!");
+			StatusOK();
+			return 0;	// write failed, device not present
+		}
+		else
+		{
+			StatusText("Version reply not received! Assuming version 1 BIOS.");
+			Sleep(SLEEP_LONG);
+			CloseStatus();
+			ResetNES(RESET_COPYMODE);
+			return 1;
+		}
 	}
-	if (i == 0xA2)
+	if ((i == 0xA2) && (ParPort != -1))
 	{
 		StatusText("Your parallel port does not support bidirectional communication!");
 		StatusText("Please correct your BIOS settings and try again.");
@@ -163,7 +175,6 @@ int	FindVersion (void)
 	Sleep(SLEEP_LONG);
 	CloseStatus();
 	// technically, these shouldn't be needed
-	InitPort();
 	ResetNES(RESET_COPYMODE);
 	return i;
 }
@@ -199,7 +210,7 @@ BOOL	Startup	(void)
 	PlugList = fopen(mapfile, "rt");
 	if (PlugList == NULL)
 	{
-		MessageBox(topHWnd,"Unable to open plugin list!", "CopyNES", MB_OK | MB_ICONERROR);
+		MessageBox(topHWnd,"Unable to open mappers.dat plugin list!", "CopyNES", MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
 	// step 1 - count how many categories we have
@@ -281,7 +292,7 @@ BOOL	Startup	(void)
 	memset(&Plugins[numcats-1], 0, sizeof(PCategory));		// clear the new one at the end
 
 	i = numcats - 2;						// and then populate the one 2nd from the end
-	j = 3;			// number of plugins below
+	j = 6;			// number of plugins below
 	Plugins[i] = (PCategory)malloc(sizeof(TCategory));
 	Plugins[i]->list = (PPlugin *)malloc((j + 1) * sizeof(PPlugin));
 	memset(Plugins[i]->list, 0, (j + 1) * sizeof(PPlugin));
@@ -305,14 +316,33 @@ BOOL	Startup	(void)
 	Plugins[i]->list[2]->file = strdup("uxram.bin");
 	Plugins[i]->list[2]->num = 2;
 	Plugins[i]->list[2]->desc = strdup("Membler's flash cart for UNROM fun");
-	// RAMCART
+	
+	Plugins[i]->list[3] = (PPlugin)malloc(sizeof(TPlugin));
+	Plugins[i]->list[3]->name = strdup("PowerPak Lite");
+	Plugins[i]->list[3]->file = strdup("pplite.bin");
+	Plugins[i]->list[3]->num = 3;
+	Plugins[i]->list[3]->desc = strdup("PowerPak Lite RAM Cart loader");
+
+	Plugins[i]->list[4] = (PPlugin)malloc(sizeof(TPlugin));
+	Plugins[i]->list[4]->name = strdup("PowerPak Boot");
+	Plugins[i]->list[4]->file = strdup("pp.bin");
+	Plugins[i]->list[4]->num = 4;
+	Plugins[i]->list[4]->desc = strdup("PowerPak Boot Flasher");
+
+	Plugins[i]->list[5] = (PPlugin)malloc(sizeof(TPlugin));
+	Plugins[i]->list[5]->name = strdup("Glider Flasher");
+	Plugins[i]->list[5]->file = strdup("glider.bin");
+	Plugins[i]->list[5]->num = 5;
+	Plugins[i]->list[5]->desc = strdup("Glider House Flasher");
+	// END RAMCART
 
 	if (!OpenPort(ParPort, ParAddr, ParECP))
 	{
 		HWVer = 0;
 		return TRUE;
 	}
-	InitPort();
+	ResetNES(RESET_COPYMODE);
+	Sleep(SLEEP_LONG);
 	ResetNES(RESET_COPYMODE);
 	HWVer = FindVersion();
 	return TRUE;
@@ -321,6 +351,7 @@ BOOL	Startup	(void)
 BOOL	Shutdown (void)
 {
 	int i, j;
+	WriteConfig();
 	if (Plugins)
 	{
 		for (i = 0; Plugins[i] != NULL; i++)
@@ -337,6 +368,7 @@ BOOL	Shutdown (void)
 		}
 		free(Plugins);
 	}
+	ResetNES(RESET_PLAYMODE);
 	ClosePort();
 	return TRUE;
 }

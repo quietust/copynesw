@@ -257,6 +257,7 @@ void	GetBanks (void)
 
 	BankPercent(0);
 	RedrawBanks();
+	InitPort();
 }
 
 INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -416,8 +417,6 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		case IDC_BANK_RESET:
 		{
 			OpenStatus(hDlg);	// it's okay to attempt to re-open the dialog - it'll ignore it
-			StatusText("Initializing parallel port...");
-			InitPort();
 			StatusText("Resetting CopyNES...");
 			ResetNES(RESET_COPYMODE);
 			StatusText("Loading plugin...");
@@ -509,6 +508,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 				if (!(i & 7))
 					StatusPercent(100 * i / DumpLen);
 			}
+			InitPort();
 			StatusPercent(100);
 			StatusText("Data dumped successfully!");
 			StatusOK();
@@ -704,8 +704,6 @@ BOOL	CMD_BANKWATCH (void)
 {
 	BOOL status;
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");

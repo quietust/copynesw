@@ -49,7 +49,7 @@ UINT32	GetCRC	(FILE *File);
 /* Config */
 extern	int	HWVer;
 extern	int	ParPort, ParAddr, ParECP;
-extern	BOOL	SaveCRC, SaveFiles;
+extern	BOOL	SaveCRC, SaveFiles, MakeUNIF;
 extern	char	Path_MAIN[MAX_PATH], Path_PRG[MAX_PATH], Path_CHR[MAX_PATH], Path_WRAM[MAX_PATH],
 	Path_NES[MAX_PATH], Path_CRC[MAX_PATH], Path_NSF[MAX_PATH], Path_PLUG[MAX_PATH];
 char *	addSlash (char *path);
@@ -73,11 +73,12 @@ void	InitPort	(void);
 void	ResetNES	(int);
 BOOL	ReadByte	(BYTE *);
 BOOL	WriteByte	(BYTE);
+BOOL	WriteBlock	(BYTE *,int);
 BOOL	ReadByteSilent	(BYTE *);
 BOOL	WriteByteSilent	(BYTE);
 BOOL	ReadByteEx	(BYTE *,int,BOOL);
 BOOL	WriteByteEx	(BYTE,int,BOOL);
-BOOL	ReadByteAsync	(void);
+BOOL	ReadByteReady	(void);
 BOOL	WriteByteAsync	(BYTE);
 BOOL	WriteCommand	(BYTE,BYTE,BYTE,BYTE,BYTE);
 BOOL	LoadPlugin	(char *);

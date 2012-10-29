@@ -8,8 +8,6 @@ BOOL	CMD_RUNPLUG (void)
 	if (plugin == NULL)
 		return FALSE;
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 

@@ -613,16 +613,20 @@ INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 				WriteByte(0x0D);
 				OpenStatus(hDlg);
 				StatusText("Running code - press OK to halt.");
-				WriteByteAsync(0x00);
+				if (ParPort != -1)
+					WriteByteAsync(0x00);
 				StatusButtonAsync(TRUE);
 				while (1)
 				{
 					if (StatusButtonPressed())
 					{
-						WriteByteAsync(0xAA);
+						if (ParPort == -1)
+							WriteByte(0xAA);
+						else
+							WriteByteAsync(0xAA);
 						break;
 					}
-					if (ReadByteAsync())
+					if (ReadByteReady())
 						break;
 				}
 				StatusButtonAsync(FALSE);
@@ -715,8 +719,6 @@ INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 BOOL	CMD_MICROBUG (void)
 {
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Initializing MicroBug...");

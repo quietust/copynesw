@@ -16,8 +16,6 @@ BOOL	UploadGAR (void)
 		return FALSE;
 	}
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading initialization plugin...");
@@ -40,19 +38,20 @@ BOOL	UploadGAR (void)
 	StatusText("Running upload plugin...");
 	RunCode();
 	StatusText("Uploading from data file...");
-	for (i = 0; i < 0x800; i++)
+	for (i = 0; i < 8; i++)
 	{
-		BYTE n;
-		fread(&n,1,1,GAR);
-		if (!WriteByte(n))
+		BYTE filedata[256];
+		fread(&filedata,256,1,GAR);
+		if (!WriteBlock(filedata, 1024))
 		{
 			fclose(GAR);
 			CloseStatus();
 			return FALSE;
 		}
-		if (!(i & 0x7))
-			StatusPercent((i*100)/2048);
+		StatusPercent((i*100)/8);
 	}
+	StatusPercent(100);
+	StatusText("...done!");
 	fclose(GAR);
 	StatusText("Upload complete!");
 	StatusOK();
@@ -75,8 +74,6 @@ BOOL	DownloadGAR (void)
 		return FALSE;
 	}
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading initialization plugin...");

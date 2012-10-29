@@ -13,8 +13,6 @@ BOOL	CMD_WRITEWRAM (void)
 	if (!PromptFile(topHWnd,"SaveRAM files (*.SAV)\0*.sav\0\0",filename,NULL,Path_WRAM,"Select an SRAM file","sav",FALSE))
 		return FALSE;
 	OpenStatus(topHWnd);
-	StatusText("Initializing parallel port...");
-	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 
@@ -37,19 +35,32 @@ BOOL	CMD_WRITEWRAM (void)
 		return FALSE;
 	}
 	fseek(WRAM,0,SEEK_SET);
-	for (i = 0; i < wramsize; i++)
+	int nblks = wramsize / 1024;
+	int nrem = wramsize % 1024;
+	BYTE n[1024];
+
+	for (i = 0; i < nblks; i++)
 	{
-		BYTE n;
-		fread(&n,1,1,WRAM);
-		if (!WriteByte(n))
+		fread(&n,1024,1,WRAM);
+		if (!WriteBlock(n, 1024))
 		{
 			fclose(WRAM);
 			CloseStatus();
 			return FALSE;
 		}
-		if (!(~i & 0x7F))
-			StatusPercent((i*100)/wramsize);
+		StatusPercent((i*100)/(nblks+1));
 	}
+	if (nrem)
+	{
+		fread(&n,nrem,1,WRAM);
+		if (!WriteBlock(n, nrem))
+		{
+			fclose(WRAM);
+			CloseStatus();
+			return FALSE;
+		}
+	}
+	StatusPercent(100);
 	fclose(WRAM);
 	StatusText("Upload complete!");
 	StatusOK();

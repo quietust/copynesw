@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 
 #pragma comment(lib, "../src/inpout32.lib")
+#pragma comment(lib, "../src/ftd2xx.lib")
 #include "inpout32.h"
 
 static	int sysver = 0;
@@ -27,9 +28,35 @@ static int SystemVersion()
 	return 0;
 }
 
+extern FT_HANDLE ftHandleA;  //DATA BUS
+extern FT_HANDLE ftHandleB;  //CONTROL BUS
+extern FT_STATUS ftStatus;   //STATUS
+
+static BOOL	OpenUSB (void)
+{
+	baseport = 0;
+	ftStatus = FT_OpenEx("USB CopyNES A",FT_OPEN_BY_DESCRIPTION,&ftHandleA);   // open data bus
+	if (ftStatus != FT_OK)
+	{
+		// failure - one or both of the devices has not been opened
+		MessageBox(topHWnd, "USB Error: Failed to open CopyNES data bus!", "OpenUSB", MB_OK | MB_ICONERROR);
+		return FALSE;
+	}
+	ftStatus = FT_OpenEx("USB CopyNES B",FT_OPEN_BY_DESCRIPTION,&ftHandleB);   //open control bus
+	if (ftStatus != FT_OK)
+	{
+		// failure - one or both of the devices has not been opened 
+		MessageBox(topHWnd, "USB Error: Failed to open CopyNES control bus!", "OpenUSB", MB_OK | MB_ICONERROR);
+		return FALSE;
+	} 
+	return TRUE;
+}
+
 static	HANDLE pport = INVALID_HANDLE_VALUE;
 BOOL	OpenPort (int port, int addr, int ecp)
 {
+	if (port == -1)
+		return OpenUSB();
 	char *pname;
 	switch (port)
 	{
@@ -74,8 +101,16 @@ BOOL	OpenPort (int port, int addr, int ecp)
 	}
 }
 
+static	void	CloseUSB (void)
+{
+	FT_Close(ftHandleA);
+	FT_Close(ftHandleB);
+}
+
 void	ClosePort (void)
 {
+	if (ParPort == -1)
+		return CloseUSB();
 	if (!baseport)
 		return;
 	baseport = 0;
@@ -90,7 +125,7 @@ unsigned char	prData (void)
 {
 	if (!baseport)
 		return 0;
-	return Inp32(baseport);
+	return (unsigned char)Inp32(baseport);
 }
 void	pwData (unsigned char data)
 {
@@ -102,7 +137,7 @@ unsigned char	prStatus (void)
 {
 	if (!baseport)
 		return 0;
-	return Inp32((unsigned short)(baseport+1));
+	return (unsigned char)Inp32((unsigned short)(baseport+1));
 }
 void	pwControl (unsigned char data)
 {
@@ -115,7 +150,7 @@ unsigned char	prECP (void)
 {
 	if (!baseport)
 		return 0;
-	return Inp32((unsigned short)(baseport+ecpoffset+0x2));
+	return (unsigned char)Inp32((unsigned short)(baseport+ecpoffset+0x2));
 }
 void	pwECP (unsigned char data)
 {

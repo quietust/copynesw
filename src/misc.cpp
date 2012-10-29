@@ -55,7 +55,7 @@ void	WriteUNIF (char *basename, char *board, int battery, int mirror, int foursc
 		year = mytime->tm_year + 1900;
 		dumpinfo[102] = (year & 0x00FF);
 		dumpinfo[103] = (year & 0xFF00) >> 8;
-		strcpy(&dumpinfo[104],"CopyNESW V2.00");
+		sprintf(&dumpinfo[104],"%sCopyNESW V%i.0", (ParPort == -1) ? "USB " : "", HWVer);
 		UNIFchunk(UNIF,"DINF",dumpinfo,204);
 	}
 
