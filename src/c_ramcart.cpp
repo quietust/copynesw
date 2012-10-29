@@ -118,7 +118,7 @@ BOOL	CNRAMcart (char *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
-	int i, j;
+	int i;
 	BYTE header[16];
 	BYTE mapper;
 	int maxchr = 4;
@@ -377,7 +377,7 @@ BOOL	PowerPakLitecart (char *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
-	int i, j;
+	int i;
 	BYTE header[16];
 	BYTE mapper;
 	int maxchr = 4;

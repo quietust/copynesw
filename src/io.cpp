@@ -156,8 +156,14 @@ BOOL WriteBlock (BYTE* blockdata, int size)
 	}
 	else
 	{
+		BOOL success;
 		for (int i = 0; i < size; i++)
-			WriteByteEx(blockdata[i], 10, TRUE);
+		{
+			success = WriteByteEx(blockdata[i], 10, TRUE);
+			if (!success)
+				return FALSE;
+		}
+		return TRUE;
 	}
 }
 
@@ -184,6 +190,7 @@ BOOL	WriteByteAsync (BYTE data)
 	if (ParPort == -1)
 	{
 		MessageBox(topHWnd, "ERROR - Code attempted to perform asynchronous write in USB mode", "WriteByteASync", MB_OK | MB_ICONERROR);
+		return FALSE;
 	}
 	else
 	{

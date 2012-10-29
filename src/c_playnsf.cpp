@@ -131,7 +131,7 @@ BOOL	LoadNSF (char *filename)
 	BYTE r[1024];
 	if (nblks)
 	{
-		int v, a;
+		int v;
 		for (v = 0; v < nblks; v++)
 		{
 			if (fread(&r,1024,1,NSF) == 0)
