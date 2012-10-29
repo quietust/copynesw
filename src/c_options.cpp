@@ -30,7 +30,7 @@ static	void	PromptForDirectory (HWND hDlg, const char *pathvar, int dlgitem)
 static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char tmpstr[16];
-	int newPort, newAddr;
+	int newPort, newAddr, newECP;
 	switch (message)
 	{
 	case WM_INITDIALOG:
@@ -51,6 +51,8 @@ static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPAR
 		SendDlgItemMessage(hDlg,IDC_CONFIG_PORT,CB_SETCURSEL,ParPort,0);
 		sprintf(tmpstr,"%X",ParAddr);
 		SetDlgItemText(hDlg,IDC_CONFIG_ADDR,tmpstr);
+		sprintf(tmpstr,"%X",ParECP);
+		SetDlgItemText(hDlg,IDC_CONFIG_ECP,tmpstr);
 		return TRUE;			break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -65,16 +67,31 @@ static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPAR
 		case IDC_CONFIG_PORT:
 			newPort = SendDlgItemMessage(hDlg,IDC_CONFIG_PORT,CB_GETCURSEL,0,0);
 			newAddr = 0;
+			newECP = 0;
 			if (newPort == 1)
+			{
 				newAddr = 0x378;
+				newECP = 0x400;
+			}
 			if (newPort == 2)
+			{
 				newAddr = 0x278;
+				newECP = 0x400;
+			}
 			if (newPort == 3)
+			{
 				newAddr = 0x3BC;
+				newECP = 0x400;
+			}
 			if (newAddr)
 			{
 				sprintf(tmpstr,"%X",newAddr);
 				SetDlgItemText(hDlg,IDC_CONFIG_ADDR,tmpstr);
+			}
+			if (newECP)
+			{
+				sprintf(tmpstr,"%X",newECP);
+				SetDlgItemText(hDlg,IDC_CONFIG_ECP,tmpstr);
 			}
 			break;
 		case IDOK:
@@ -91,14 +108,17 @@ static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPAR
 			newPort = SendDlgItemMessage(hDlg,IDC_CONFIG_PORT,CB_GETCURSEL,0,0);
 			GetDlgItemText(hDlg,IDC_CONFIG_ADDR,tmpstr,16);
 			sscanf(tmpstr,"%X",&newAddr);
-			if ((newPort != ParPort) || (newAddr != ParAddr))
+			GetDlgItemText(hDlg,IDC_CONFIG_ECP,tmpstr,16);
+			sscanf(tmpstr,"%X",&newECP);
+			if ((newPort != ParPort) || (newAddr != ParAddr) || (newECP != ParECP))
 			{
 				extern void EnableMenus (HWND);
 				extern int FindVersion (void);
 				ClosePort();
 				ParPort = newPort;
 				ParAddr = newAddr;
-				if (OpenPort(ParPort, ParAddr))
+				ParECP = newECP;
+				if (OpenPort(ParPort, ParAddr, ParECP))
 				{
 					InitPort();
 					ResetNES(RESET_COPYMODE);

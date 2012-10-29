@@ -48,7 +48,7 @@ UINT32	GetCRC	(FILE *File);
 
 /* Config */
 extern	int	HWVer;
-extern	int	ParPort, ParAddr;
+extern	int	ParPort, ParAddr, ParECP;
 extern	BOOL	SaveCRC, SaveFiles;
 extern	char	Path_MAIN[MAX_PATH], Path_PRG[MAX_PATH], Path_CHR[MAX_PATH], Path_WRAM[MAX_PATH],
 	Path_NES[MAX_PATH], Path_CRC[MAX_PATH], Path_NSF[MAX_PATH], Path_PLUG[MAX_PATH];
@@ -56,7 +56,7 @@ char *	addSlash (char *path);
 void	WriteConfig (void);
 
 /* I/O Driver */
-BOOL	OpenPort (int port, int addr);
+BOOL	OpenPort (int port, int addr, int ecp);
 void	ClosePort (void);
 unsigned char	prData (void);
 void	pwData (unsigned char);

@@ -254,9 +254,6 @@
 				</FileConfiguration>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\src\hwinterface.sys">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -13,7 +13,6 @@
 #define IDD_GENERICPROMPTLONG           107
 #define IDD_STATUS                      108
 #define IDD_BANKWATCH                   109
-#define IDR_DRIVER                      110
 #define IDD_MICROBUG                    111
 #define IDD_VRC7TUNER                   112
 #define IDC_MAIN_MAKENES                1000
@@ -188,6 +187,7 @@
 #define IDC_VRC7_MSEDIT                 1169
 #define IDC_VRC7_MRSLID                 1170
 #define IDC_VRC7_MREDIT                 1171
+#define IDC_CONFIG_ECP                  1172
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -196,7 +196,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         1172
+#define _APS_NEXT_CONTROL_VALUE         1173
 #define _APS_NEXT_SYMED_VALUE           114
 #endif
 #endif

@@ -2,7 +2,7 @@
 #include <shlobj.h>
 
 int	HWVer;
-int	ParPort, ParAddr;
+int	ParPort, ParAddr, ParECP;
 BOOL	SaveCRC, SaveFiles;
 char	Path_MAIN[MAX_PATH], Path_PRG[MAX_PATH], Path_CHR[MAX_PATH], Path_WRAM[MAX_PATH],
 	Path_NES[MAX_PATH], Path_CRC[MAX_PATH], Path_NSF[MAX_PATH], Path_PLUG[MAX_PATH];
@@ -298,7 +298,7 @@ BOOL	Startup	(void)
 	Plugins[i]->list[2]->desc = strdup("Membler's flash cart for UNROM fun");
 	// RAMCART
 
-	if (!OpenPort(ParPort, ParAddr))
+	if (!OpenPort(ParPort, ParAddr, ParECP))
 	{
 		HWVer = 0;
 		return TRUE;
