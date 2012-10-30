@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Disassemble"
 
 enum ADDRMODE { IMP, ACC, IMM, ADR, ABS, IND, REL, ABX, ABY, ZPG, ZPX, ZPY, INX, INY, ERR, NUM_ADDR_MODES };

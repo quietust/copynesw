@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Break Banks"
 
 BOOL	CMD_BREAKBANK (void)

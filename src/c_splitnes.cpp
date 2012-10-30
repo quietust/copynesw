@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Split .NES"
 
 BOOL	SplitIt (char *infile, char *filename)

@@ -1,5 +1,4 @@
-#include "StdAfx.h"
-#include <commctrl.h>
+#include "CopyNESW.h"
 
 /* Status dialog */
 static	BOOL StatButton;

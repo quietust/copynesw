@@ -1,5 +1,5 @@
-#include "StdAfx.h"
-#include <shlobj.h>
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Options"
 
 // This MUST match the "USB" setting below

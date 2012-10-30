@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Dump Cartridge"
 
 BOOL	CMD_DUMPCART (void)

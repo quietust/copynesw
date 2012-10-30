@@ -1,5 +1,5 @@
-#include "StdAfx.h"
-#include <commctrl.h>
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Bankwatch"
 
 static	HWND	bankWnd;

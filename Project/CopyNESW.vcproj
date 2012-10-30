@@ -207,9 +207,6 @@
 				RelativePath="..\src\crc32.cpp">
 			</File>
 			<File
-				RelativePath="..\src\inpout32drv.cpp">
-			</File>
-			<File
 				RelativePath="..\src\io.cpp">
 			</File>
 			<File
@@ -217,9 +214,6 @@
 			</File>
 			<File
 				RelativePath="..\src\miscdialogs.cpp">
-			</File>
-			<File
-				RelativePath="..\src\StdAfx.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -230,9 +224,6 @@
 			</File>
 			<File
 				RelativePath="..\src\resource.h">
-			</File>
-			<File
-				RelativePath="..\src\StdAfx.h">
 			</File>
 		</Filter>
 		<Filter

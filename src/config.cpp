@@ -1,5 +1,4 @@
-#include "StdAfx.h"
-#include <shlobj.h>
+#include "CopyNESW.h"
 
 int	HWVer;
 int	ParPort, ParAddr, ParECP;

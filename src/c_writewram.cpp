@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Write SRAM"
 
 BOOL	CMD_WRITEWRAM (void)

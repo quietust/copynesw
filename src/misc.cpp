@@ -1,5 +1,4 @@
-#include "StdAfx.h"
-#include <time.h>
+#include "CopyNESW.h"
 
 char	*strjoin3 (char *out, const char *in1, const char *in2, const char *in3)
 {

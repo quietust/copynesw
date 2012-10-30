@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
 
 #define MAX_LOADSTRING 100
 

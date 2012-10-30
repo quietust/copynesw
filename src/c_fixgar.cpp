@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Fix Game Action Replay"
 
 BOOL	UploadGAR (void)

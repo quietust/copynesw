@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Play Cartridge"
 
 BOOL	CMD_PLAYCART (void)

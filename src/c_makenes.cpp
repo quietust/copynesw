@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Make .NES"
 
 BOOL	CMD_MAKENES (void)

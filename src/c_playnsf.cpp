@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Play NSF"
 
 static	char	NSF_name[33], NSF_artist[33], NSF_copyright[33];

@@ -1,6 +1,14 @@
 #ifndef COPYNESW_H
 #define COPYNESW_H
 
+#include <windows.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <commctrl.h>
+#include <shlobj.h>
+#include <time.h>
+#include "resource.h"
+
 extern	HINSTANCE hInst;
 extern	HWND	topHWnd;
 

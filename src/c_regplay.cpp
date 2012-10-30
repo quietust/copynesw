@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Play Register Dump"
 
 BOOL	RegPlayNES (char *filename)

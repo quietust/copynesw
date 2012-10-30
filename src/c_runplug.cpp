@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
+
 #define	CMD_NAME	"Run Plugin"
 
 BOOL	CMD_RUNPLUG (void)

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "CopyNESW.h"
 
 static	UINT32	CRCtable[256];
 void	InitCRC (void)
