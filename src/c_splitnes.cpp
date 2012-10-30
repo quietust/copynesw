@@ -5,15 +5,14 @@
 BOOL	SplitIt (char *infile, char *filename)
 {
 	FILE *NES, *PRG, *CHR;
-	char outprg[MAX_PATH], outchr[MAX_PATH];
 	BYTE buf[1024];
 	int PRGcount, CHRcount;
 	BOOL isError = FALSE;
 	int i;
 	
 	NES = fopen(infile,"rb");
-	PRG = fopen(strjoin3(outprg,Path_PRG,filename,".prg"),"wb");
-	CHR = fopen(strjoin3(outchr,Path_CHR,filename,".chr"),"wb");
+	PRG = fopen((string(Path_PRG) + filename + ".prg").c_str(),"wb");
+	CHR = fopen((string(Path_CHR) + filename + ".chr").c_str(),"wb");
 	if (NES == NULL)
 	{
 		MessageBox(topHWnd,"Unable to open input file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);

@@ -6,11 +6,11 @@ BOOL	CMD_DUMPCART (void)
 {
 	int dtype = 2;
 	int rbyte = 0, rcount = 0;
-	PPlugin plugin;
+	Plugin *plugin;
 	char *path, *ext;
 	char filename[MAX_PATH];
-	char fnamebuf[MAX_PATH];
-	int cmode, battery, bytes, numk;
+	BYTE cmode, battery;
+	int bytes, numk;
 	BYTE ctype;
 	WORD nblks;
 	char Status[256];
@@ -26,6 +26,7 @@ BOOL	CMD_DUMPCART (void)
 		return FALSE;
 	strcpy(filename,PromptResult);
 
+	InitPort();
 	OpenStatus(topHWnd);
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
@@ -42,7 +43,7 @@ BOOL	CMD_DUMPCART (void)
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
-	if (!LoadPlugin(plugin->file))
+	if (!LoadPlugin(plugin))
 	{
 		CloseStatus();
 		return FALSE;
@@ -52,10 +53,9 @@ BOOL	CMD_DUMPCART (void)
 	Sleep(SLEEP_LONG);
 
 	if (SaveCRC)
-		CRC = fopen(strjoin3(fnamebuf,Path_CRC,filename,".txt"),"wb");
+		CRC = fopen((string(Path_CRC) + filename + ".txt").c_str(),"wb");
 	
-	cmode = 0;
-	if (!ReadByte((BYTE *)&cmode))		// mirroring
+	if (!ReadByte(cmode))		// mirroring
 	{
 		CloseStatus();
 		return FALSE;
@@ -65,14 +65,16 @@ BOOL	CMD_DUMPCART (void)
 	{	// for the first 'header' byte, wait longer than usual
 		// since the plugin might be busy doing size detection, which can take a while
 		int s;
-		if (!ReadByteEx((BYTE *)&nblks,15,TRUE) || !ReadByte((BYTE *)&nblks+1))
+		BYTE n[2];
+		if (!ReadByteEx(n[0],15,TRUE) || !ReadByte(n[1]))
 		{
 			CloseStatus();
 			return FALSE;
 		}
+		nblks = n[0] | (n[1] << 8);
 		bytes = nblks << 8;
 		numk = bytes / 1024;
-		if (!ReadByte(&ctype))
+		if (!ReadByte(ctype))
 		{
 			CloseStatus();
 			return FALSE;
@@ -98,7 +100,7 @@ BOOL	CMD_DUMPCART (void)
 			return FALSE;					break;
 		}
 		StatusText(Status);
-		DATA = fopen(strjoin3(fnamebuf,path,filename,ext),"w+b");
+		DATA = fopen((string(path) + filename + ext).c_str(),"w+b");
 		if (DATA == NULL)
 		{
 			StatusText("Unable to open output file!");
@@ -111,7 +113,7 @@ BOOL	CMD_DUMPCART (void)
 			BYTE n;
 			for (a = 0; a < 1024; a++)
 			{
-				if (!ReadByte(&n))
+				if (!ReadByte(n))
 				{
 					CloseStatus();
 					return FALSE;
@@ -127,15 +129,17 @@ BOOL	CMD_DUMPCART (void)
 					StatusText("Resetting CopyNES as requested by plugin...");
 					ResetNES(RESET_COPYMODE);
 					StatusText("Reloading plugin...");
-					LoadPlugin(plugin->file);
+					LoadPlugin(plugin);
 					StatusText("Rerunning plugin...");
 					RunCode();
 					rbyte = 0;
-					if (!ReadByte((BYTE *)&rbyte) || !ReadByte((BYTE *)&rbyte+1))
+					BYTE n[2];
+					if (!ReadByte(n[0]) || !ReadByte(n[1]))
 					{
 						CloseStatus();
 						return FALSE;
 					}
+					rbyte = n[0] | (n[1] << 8);
 					rbyte /= 4;
 				}
 			}
@@ -161,11 +165,11 @@ BOOL	CMD_DUMPCART (void)
 			return TRUE;
 		WriteNES(filename,plugin->num,battery,mirror,scrn4);
 		if (MakeUNIF)
-			WriteUNIF(filename,plugin->name,battery,mirror,scrn4,mcon);
+			WriteUNIF(filename,plugin->name.c_str(),battery,mirror,scrn4,mcon);
 		if (SaveFiles == 0)
 		{
-			unlink(strjoin3(fnamebuf,Path_CHR,filename,".chr"));
-			unlink(strjoin3(fnamebuf,Path_PRG,filename,".prg"));
+			unlink((string(Path_CHR) + filename + ".chr").c_str());
+			unlink((string(Path_PRG) + filename + ".prg").c_str());
 		}
 	}
 	return TRUE;

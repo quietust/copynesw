@@ -74,18 +74,22 @@ void	ShowRegs (void)
 
 	a &= WriteByte(0x02);	// read registers
 
-	a &= ReadByteEx(&RegA,1,FALSE);
-	a &= ReadByteEx(&RegX,1,FALSE);
-	a &= ReadByteEx(&RegY,1,FALSE);
-	a &= ReadByteEx(&RegP,1,FALSE);
-	a &= ReadByteEx(&RegSP,1,FALSE);
-	a &= ReadByteEx((BYTE *)&RegPC+0,1,FALSE);
-	a &= ReadByteEx((BYTE *)&RegPC+1,1,FALSE);
-	a &= ReadByteEx((BYTE *)&RegBreak+0,1,FALSE);
-	a &= ReadByteEx((BYTE *)&RegBreak+1,1,FALSE);
-	a &= ReadByteEx((BYTE *)&cycles+0,1,FALSE);
-	a &= ReadByteEx((BYTE *)&cycles+1,1,FALSE);
-	a &= ReadByteEx(&mode,1,FALSE);
+	a &= ReadByteEx(RegA,1,FALSE);
+	a &= ReadByteEx(RegX,1,FALSE);
+	a &= ReadByteEx(RegY,1,FALSE);
+	a &= ReadByteEx(RegP,1,FALSE);
+	a &= ReadByteEx(RegSP,1,FALSE);
+	BYTE n[2];
+	a &= ReadByteEx(n[0],1,FALSE);
+	a &= ReadByteEx(n[1],1,FALSE);
+	RegPC = n[0] | (n[1] << 8);
+	a &= ReadByteEx(n[0],1,FALSE);
+	a &= ReadByteEx(n[1],1,FALSE);
+	RegBreak = n[0] | (n[1] << 8);
+	a &= ReadByteEx(n[0],1,FALSE);
+	a &= ReadByteEx(n[1],1,FALSE);
+	cycles = n[0] | (n[1] << 8);
+	a &= ReadByteEx(mode,1,FALSE);
 	if (!a)
 	{
 		MessageBox(BugWnd,"Timeout while retrieving registers!",CMD_NAME,MB_OK | MB_ICONERROR);
@@ -136,7 +140,7 @@ void	DoBanks (void)
 	{
 		WriteByte(0x0C);
 		for (i = 0; i < 64; i++)
-			if (!ReadByteEx(&banks[i], 1, FALSE))
+			if (!ReadByteEx(banks[i], 1, FALSE))
 				break;
 		if (i != 64)
 			return;
@@ -188,7 +192,7 @@ void	DumpBs (void)
 	WriteByte(0x40);
 
 	for (i = 0; i < 64; i++)
-		ReadByte(&watchdata[i]);
+		ReadByte(watchdata[i]);
 
 	for (i = 0; i < 64; i += 16)
 	{
@@ -280,8 +284,10 @@ void	Update (void)
 	DumpBs();
 
 	WriteByte(0x05);		// save PC
-	ReadByte((BYTE *)&BackPC+0);
-	ReadByte((BYTE *)&BackPC+1);
+	BYTE n[2];
+	ReadByte(n[0]);
+	ReadByte(n[1]);
+	BackPC = n[0] | (n[1] << 8);
 
 	WriteByte(0x06);		// set PC to cursor pos
 	WriteByte((BYTE)(RegCursor & 0xFF));
@@ -291,24 +297,24 @@ void	Update (void)
 		WriteByte(0x07);
 	else	WriteByte(0x03);	// do disassembly
 
-	ReadByte(&len1);
+	ReadByte(len1);
 
 	for (i = 0; i < len1; i++)
-		ReadByte(&RAM0[i]);
+		ReadByte(RAM0[i]);
 
 	len2 = 0;
 	for (i = 0; i < 8; i++)
 	{
 		BYTE x;
-		ReadByte(&RAM1[len2++]);
-		ReadByte(&x);
+		ReadByte(RAM1[len2++]);
+		ReadByte(x);
 		if (x == 3)
 		{
-			ReadByte(&RAM1[len2++]);
+			ReadByte(RAM1[len2++]);
 			x--;
 		}
 		if (x == 2)
-			ReadByte(&RAM1[len2++]);
+			ReadByte(RAM1[len2++]);
 	}
 
 	SendDlgItemMessage(BugWnd, IDC_MICRO_DISASM, LB_RESETCONTENT, 0, 0);	// clear the disasm box
@@ -331,7 +337,7 @@ void	Update (void)
 
 	SendDlgItemMessage(BugWnd, IDC_MICRO_DISASM, LB_SETCURSEL, 8, 0);	// put selection at cursor
 
-	ReadByteEx(&len2,1,FALSE);
+	ReadByteEx(len2,1,FALSE);
 
 	WriteByte(0x06);		// restore PC
 	WriteByte((BYTE)(BackPC & 0xFF));
@@ -603,7 +609,9 @@ INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 			break;
 		case IDC_MICRO_STEP:
 			WriteByte(0x00);
-			ReadByte((BYTE *)&i);
+			BYTE n;
+			ReadByte(n);
+			i = n;
 			ShowRegs();
 			RegCursor = RegPC;
 			Update();
@@ -631,7 +639,7 @@ INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 						break;
 				}
 				StatusButtonAsync(FALSE);
-				ReadByte(&status);
+				ReadByte(status);
 				if (status == 1)
 					StatusText("HLT instruction encountered!");
 				else if (status == 2)
@@ -720,6 +728,7 @@ INT_PTR CALLBACK DLG_MicroBug(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 BOOL	CMD_MICROBUG (void)
 {
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Initializing MicroBug...");

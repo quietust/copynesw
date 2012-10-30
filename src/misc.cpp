@@ -1,34 +1,26 @@
 #include "CopyNESW.h"
 
-char	*strjoin3 (char *out, const char *in1, const char *in2, const char *in3)
-{
-	strcpy(out,in1);
-	strcat(out,in2);
-	strcat(out,in3);
-	return out;
-}
-
-void	UNIFchunk (FILE *file, char *name, void *data, int len)
+void	UNIFchunk (FILE *file, const char *name, const void *data, int len)
 {
 	fwrite(name,4,1,file);
 	fwrite(&len,4,1,file);
 	if (data != NULL)	fwrite(data,len,1,file);
 }
-void	WriteUNIF (char *basename, char *board, int battery, int mirror, int fourscrn, int mcon)
+void	WriteUNIF (const char *basename, const char *board, int battery, int mirror, int fourscrn, int mcon)
 {
 	FILE *UNIF, *PRG, *CHR;
 	int a, b;
 	char filename[MAX_PATH];
 	if (battery)	// 'battery' merely indicates the possibility - need to confirm
 		battery = (MessageBox(topHWnd,"Really has battery?","UNIF",MB_YESNO | MB_ICONQUESTION) == IDYES);
-	UNIF = fopen(strjoin3(filename,Path_NES,basename,".unf"),"wb");
-	PRG = fopen(strjoin3(filename,Path_PRG,basename,".prg"),"rb");
+	UNIF = fopen((string(Path_NES) + basename + ".unf").c_str(),"wb");
+	PRG = fopen((string(Path_PRG) + basename + ".prg").c_str(),"rb");
 	if (!PRG)
 	{
 		fclose(UNIF);
 		return;
 	}
-	CHR = fopen(strjoin3(filename,Path_CHR,basename,".chr"),"rb");
+	CHR = fopen((string(Path_CHR) + basename + ".chr").c_str(),"rb");
 	fwrite("UNIF",4,1,UNIF);
 	a = 7;
 	fwrite(&a,4,1,UNIF);
@@ -197,10 +189,10 @@ void	WriteUNIF (char *basename, char *board, int battery, int mirror, int foursc
 		fclose(CHR);
 	MessageBox(topHWnd,".UNIF created successfully!","CopyNESW",MB_OK);
 }
-void	WriteNES (char *basename, int mapper, int battery, int mirror, int fourscrn)
+
+void	WriteNES (const char *basename, int mapper, int battery, int mirror, int fourscrn)
 {
 	FILE *NES, *PRG, *CHR;
-	char filename[MAX_PATH];
 	int a;
 	unsigned char prglen = 0, chrlen = 0, maplo, maphi;
 	if (mapper == -1)
@@ -209,9 +201,9 @@ void	WriteNES (char *basename, int mapper, int battery, int mirror, int fourscrn
 	if (battery)	// 'battery' merely indicates the possibility - need to confirm
 		battery = (MessageBox(topHWnd,"Really has battery?","NES",MB_YESNO | MB_ICONQUESTION) == IDYES);
 
-	NES = fopen(strjoin3(filename,Path_NES,basename,".nes"),"wb");
-	PRG = fopen(strjoin3(filename,Path_PRG,basename,".prg"),"rb");
-	CHR = fopen(strjoin3(filename,Path_CHR,basename,".chr"),"rb");
+	NES = fopen((string(Path_NES) + basename + ".nes").c_str(),"wb");
+	PRG = fopen((string(Path_PRG) + basename + ".prg").c_str(),"rb");
+	CHR = fopen((string(Path_CHR) + basename + ".chr").c_str(),"rb");
 
 	fwrite("NES\x1A",4,1,NES);
 	fseek(PRG,0,SEEK_END);

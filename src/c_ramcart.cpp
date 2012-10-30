@@ -2,7 +2,7 @@
 
 #define	CMD_NAME	"RAM Cart"
 
-BOOL	NRAMcart (char *plugin)
+BOOL	NRAMcart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -64,6 +64,7 @@ BOOL	NRAMcart (char *plugin)
 		MessageBox(topHWnd,"Please set your cartridge to VERTICAL mirroring.",MSGBOX_TITLE,MB_OK);
 	else MessageBox(topHWnd,"Please set your cartridge to HORIZONTAL mirroring.",MSGBOX_TITLE,MB_OK);
 
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -115,7 +116,7 @@ BOOL	NRAMcart (char *plugin)
 	return TRUE;
 }
 
-BOOL	CNRAMcart (char *plugin)
+BOOL	CNRAMcart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -176,6 +177,7 @@ BOOL	CNRAMcart (char *plugin)
 		MessageBox(topHWnd,"Please set your cartridge to VERTICAL mirroring.",MSGBOX_TITLE,MB_OK);
 	else MessageBox(topHWnd,"Please set your cartridge to HORIZONTAL mirroring.",MSGBOX_TITLE,MB_OK);
 
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -245,7 +247,7 @@ BOOL	CNRAMcart (char *plugin)
 	return TRUE;
 }
 
-BOOL	UFROMcart (char *plugin)
+BOOL	UFROMcart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -298,6 +300,7 @@ BOOL	UFROMcart (char *plugin)
 		MessageBox(topHWnd,"Please set your cartridge to VERTICAL mirroring.",MSGBOX_TITLE,MB_OK);
 	else MessageBox(topHWnd,"Please set your cartridge to HORIZONTAL mirroring.",MSGBOX_TITLE,MB_OK);
 
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -312,7 +315,7 @@ BOOL	UFROMcart (char *plugin)
 	Sleep(SLEEP_SHORT);
 
 	StatusText("Erasing Flash ROM...");
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		fclose(NES);
 		CloseStatus();
@@ -321,7 +324,7 @@ BOOL	UFROMcart (char *plugin)
 	for (i = 0; i < banks; i++)
 	{
 		BYTE a;
-		if (!ReadByte(&a))
+		if (!ReadByte(a))
 		{
 			fclose(NES);
 			CloseStatus();
@@ -355,7 +358,7 @@ BOOL	UFROMcart (char *plugin)
 	StatusText("...done!");
 	fclose(NES);
 
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		CloseStatus();
 		return FALSE;
@@ -374,7 +377,7 @@ BOOL	UFROMcart (char *plugin)
 	return TRUE;
 }
 
-BOOL	PowerPakLitecart (char *plugin)
+BOOL	PowerPakLitecart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -475,6 +478,7 @@ BOOL	PowerPakLitecart (char *plugin)
 		StatusText("More than %iKB of CHR ROM data was detected, sending first %iKB only...", maxchr * 8, maxchr * 8);
 	else	StatusText("%iKB CHR ROM data located...", header[5] * 8);
 
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -577,7 +581,7 @@ BOOL	PowerPakLitecart (char *plugin)
 	return TRUE;
 }
 
-BOOL	PowerPakcart (char *plugin)
+BOOL	PowerPakcart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -627,6 +631,7 @@ BOOL	PowerPakcart (char *plugin)
 		return FALSE;
 	}
 
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -641,7 +646,7 @@ BOOL	PowerPakcart (char *plugin)
 	Sleep(SLEEP_SHORT);
 
 	StatusText("Erasing Flash ROM...");
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		fclose(NES);
 		CloseStatus();
@@ -650,7 +655,7 @@ BOOL	PowerPakcart (char *plugin)
 	for (i = 0; i < banks; i++)
 	{
 		BYTE a;
-		if (!ReadByte(&a))
+		if (!ReadByte(a))
 		{
 			fclose(NES);
 			CloseStatus();
@@ -686,7 +691,7 @@ BOOL	PowerPakcart (char *plugin)
 	StatusText("...done!"); 
 	fclose(NES);
 
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		CloseStatus();
 		return FALSE;
@@ -705,7 +710,7 @@ BOOL	PowerPakcart (char *plugin)
 	return TRUE;
 }
 
-BOOL	Glidercart (char *plugin)
+BOOL	Glidercart (Plugin *plugin)
 {
 	char filenes[MAX_PATH];
 	FILE *NES;
@@ -750,7 +755,7 @@ BOOL	Glidercart (char *plugin)
 	if (header[5] > 0)
 		StatusText("%iKB of CHR ROM data was detected, ignoring...", header[5] * 8);
 
-
+	InitPort();
 	StatusText("Resetting USB CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");
@@ -765,7 +770,7 @@ BOOL	Glidercart (char *plugin)
 	Sleep(SLEEP_SHORT);
 
 	StatusText("Erasing Flash ROM...");
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		fclose(NES);
 		CloseStatus();
@@ -774,7 +779,7 @@ BOOL	Glidercart (char *plugin)
 	for (i = 0; i < banks; i++)
 	{
 		BYTE a;
-		if (!ReadByte(&a))
+		if (!ReadByte(a))
 		{
 			fclose(NES);
 			CloseStatus();
@@ -810,7 +815,7 @@ BOOL	Glidercart (char *plugin)
 	StatusText("...done!"); 
 	fclose(NES);
 
-	if (!ReadByte(&banks))
+	if (!ReadByte(banks))
 	{
 		CloseStatus();
 		return FALSE;
@@ -831,23 +836,23 @@ BOOL	Glidercart (char *plugin)
 
 BOOL	CMD_RAMCART (void)
 {
-	PPlugin plugin;
+	Plugin *plugin;
 	// select board name
 	plugin = PromptPlugin(PLUG_UPLOAD);
 	if (plugin == NULL)
 		return FALSE;
 
 	if (plugin->num == 0)
-		return NRAMcart(plugin->file);
+		return NRAMcart(plugin);
 	else if (plugin->num == 1)
-		return CNRAMcart(plugin->file);
+		return CNRAMcart(plugin);
 	else if (plugin->num == 2)
-		return UFROMcart(plugin->file);
+		return UFROMcart(plugin);
 	else if (plugin->num == 3)
-		return PowerPakLitecart(plugin->file);
+		return PowerPakLitecart(plugin);
 	else if (plugin->num == 4)
-		return PowerPakcart(plugin->file);
+		return PowerPakcart(plugin);
 	else if (plugin->num == 5)
-		return Glidercart(plugin->file);
+		return Glidercart(plugin);
 	else return FALSE;
 }

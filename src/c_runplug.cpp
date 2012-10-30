@@ -4,16 +4,17 @@
 
 BOOL	CMD_RUNPLUG (void)
 {
-	PPlugin plugin;
+	Plugin *plugin;
 	plugin = PromptPlugin(PLUG_UTIL);
 	if (plugin == NULL)
 		return FALSE;
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 
 	StatusText("Loading plugin...");
-	if (!LoadPlugin(plugin->file))
+	if (!LoadPlugin(plugin))
 	{
 		CloseStatus();
 		return FALSE;

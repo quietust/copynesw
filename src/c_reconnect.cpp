@@ -12,6 +12,8 @@ BOOL	CMD_RECONNECT (void)
 	StatusText("Reconnecting...");
 	if (OpenPort(ParPort, ParAddr, ParECP))
 	{
+		if (ParPort != -1)
+			InitPort();
 		ResetNES(RESET_COPYMODE);
 		HWVer = FindVersion();
 		EnableMenus(topHWnd);

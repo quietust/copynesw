@@ -9,28 +9,36 @@
 #include <time.h>
 #include "resource.h"
 
+#include <string>
+#include <vector>
+using namespace std;
+
 extern	HINSTANCE hInst;
 extern	HWND	topHWnd;
 
-/* Plugins */
-typedef	struct	Plugin
+struct Plugin
 {
-	char *name;
-	char *file;
 	int num;
-	char *desc;
-}	TPlugin, *PPlugin;
+	string name;
+	string desc;
+	BYTE header[128];
+	BYTE data[1024];
+	string romstring;
+};
 
-typedef	struct	Category
+enum plugin_type { PLUG_STD = 0, PLUG_WRAM = 1, PLUG_UTIL = 2, PLUG_UPLOAD = -1 };
+
+struct Category
 {
-	PPlugin *list;
-	int type;
-	char *desc;
-}	TCategory, *PCategory;
-extern	PCategory *Plugins;
+	vector<Plugin *> list;
+	plugin_type type;
+	string desc;
+};
+extern	vector<Category *> Plugins;
 
-/* Misc Dialogs */
+/* miscdialogs */
 extern	HWND	DlgStatus;
+
 void	CloseStatus (void);
 void	OpenStatus (HWND hWnd);
 void	__cdecl	StatusText (char *text, ...);
@@ -39,22 +47,19 @@ void	StatusButton (void);
 void	StatusButtonAsync (BOOL);
 BOOL	StatusButtonPressed (void);
 void	StatusOK (void);
+
 extern	char	*PromptTitle;
 extern	char	PromptResult[1024];
 BOOL	Prompt (HWND hWnd);
 BOOL	PromptLong (HWND hWnd);
-BOOL	PromptFile (HWND hWnd, char *Filter, char *FilePath, char *FileName, char *InitDir, char *Title, char *DefExt, BOOL Save);
-PPlugin	PromptPlugin (int Type);
-#define	PLUG_STD	0
-#define	PLUG_WRAM	1
-#define	PLUG_UTIL	2
-#define	PLUG_UPLOAD	-1
+BOOL	PromptFile (HWND hWnd, const char *Filter, char *FilePath, char *FileName, const char *InitDir, const char *Title, const char *DefExt, BOOL Save);
+Plugin *PromptPlugin (plugin_type Type);
 
-/* CRC32 */
+/* crc32 */
 void	InitCRC	(void);
 UINT32	GetCRC	(FILE *File);
 
-/* Config */
+/* config */
 extern	int	HWVer;
 extern	int	ParPort, ParAddr, ParECP;
 extern	BOOL	SaveCRC, SaveFiles, MakeUNIF;
@@ -62,42 +67,37 @@ extern	char	Path_MAIN[MAX_PATH], Path_PRG[MAX_PATH], Path_CHR[MAX_PATH], Path_WR
 	Path_NES[MAX_PATH], Path_CRC[MAX_PATH], Path_NSF[MAX_PATH], Path_PLUG[MAX_PATH];
 char *	addSlash (char *path);
 void	WriteConfig (void);
+Plugin *makePlugin (const char *name, const char *filename, int num, const char *desc);
 
-/* I/O Driver */
-BOOL	OpenPort (int port, int addr, int ecp);
-void	ClosePort (void);
-unsigned char	prData (void);
-void	pwData (unsigned char);
-unsigned char	prStatus (void);
-void	pwControl (unsigned char);
-
-/* I/O routines */
+/* io */
 #define	RESET_COPYMODE	0
 #define	RESET_PLAYMODE	1
 #define	RESET_ALTPORT	2
 #define	RESET_NORESET	4
 extern	char	ROMstring[256];
+BOOL	OpenPort	(int port, int addr, int ecp);
+void	ClosePort	(void);
 void	InitPort	(void);
 void	ResetNES	(int);
-BOOL	ReadByte	(BYTE *);
+BOOL	ReadByte	(BYTE &);
 BOOL	WriteByte	(BYTE);
-BOOL	WriteBlock	(BYTE *,int);
-BOOL	ReadByteSilent	(BYTE *);
+BOOL	WriteBlock	(const BYTE *,int);
+BOOL	ReadByteSilent	(BYTE &);
 BOOL	WriteByteSilent	(BYTE);
-BOOL	ReadByteEx	(BYTE *,int,BOOL);
+BOOL	ReadByteEx	(BYTE &,int,BOOL);
 BOOL	WriteByteEx	(BYTE,int,BOOL);
 BOOL	ReadByteReady	(void);
 BOOL	WriteByteAsync	(BYTE);
 BOOL	WriteCommand	(BYTE,BYTE,BYTE,BYTE,BYTE);
-BOOL	LoadPlugin	(char *);
+BOOL	LoadPlugin	(const Plugin *);
+BOOL	LoadPlugin	(const char *filename);
 BOOL	RunCode		(void);
 
-/* Miscellaneous functions */
+/* misc */
 #define	SLEEP_SHORT	100
 #define	SLEEP_LONG	1000
-char	*strjoin3	(char *out, const char *in1, const char *in2, const char *in3);
-void	WriteUNIF	(char *,char *,int,int,int,int);
-void	WriteNES	(char *,int,int,int,int);
+void	WriteUNIF	(const char *basename,const char *board,int batt,int mirr,int fourscrn,int mcon);
+void	WriteNES	(const char *basename,int mapper,int battery,int mirror,int fourscrn);
 
 #define	MSGBOX_TITLE	"CopyNESW - " CMD_NAME
 

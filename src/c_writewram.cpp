@@ -4,7 +4,7 @@
 
 BOOL	CMD_WRITEWRAM (void)
 {
-	PPlugin plugin;
+	Plugin *plugin;
 	char filename[MAX_PATH];
 	int i, wramsize;
 	FILE *WRAM;
@@ -14,11 +14,12 @@ BOOL	CMD_WRITEWRAM (void)
 	if (!PromptFile(topHWnd,"SaveRAM files (*.SAV)\0*.sav\0\0",filename,NULL,Path_WRAM,"Select an SRAM file","sav",FALSE))
 		return FALSE;
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 
 	StatusText("Loading plugin...");
-	if (!LoadPlugin(plugin->file))
+	if (!LoadPlugin(plugin))
 	{
 		CloseStatus();
 		return FALSE;

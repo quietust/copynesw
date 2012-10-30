@@ -150,7 +150,8 @@ static	INT_PTR CALLBACK DLG_Options(HWND hDlg, UINT message, WPARAM wParam, LPAR
 				ParECP = newECP;
 				if (OpenPort(ParPort, ParAddr, ParECP))
 				{
-					InitPort();
+					if (ParPort != -1)
+						InitPort();
 					ResetNES(RESET_COPYMODE);
 					HWVer = FindVersion();
 				}

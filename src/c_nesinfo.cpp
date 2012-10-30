@@ -7,6 +7,7 @@ BOOL	CMD_NESINFO (void)
 	char Version[256];
 	int i;
 	OpenStatus(topHWnd);
+	InitPort();
 	if (HWVer == 1)
 	{
 		if (ParPort == -1)
@@ -32,7 +33,7 @@ BOOL	CMD_NESINFO (void)
 
 	for (i = 0; i < 256; i++)
 	{
-		if (!ReadByteEx((BYTE*)&Version[i],1,FALSE))
+		if (!ReadByteEx((BYTE &)Version[i],1,FALSE))
 		{
 			StatusText("Error reading version string!");
 			StatusOK();

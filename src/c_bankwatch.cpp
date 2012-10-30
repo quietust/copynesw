@@ -219,14 +219,14 @@ void	GetBanks (void)
 	for (i = 0; i < 8; i++)
 	{
 		for (j = 0; j < 256; j++)
-			if (!ReadByte(&CHRbuffer[i][j]))
+			if (!ReadByte(CHRbuffer[i][j]))
 			{
 				EndDialog(bankWnd,FALSE);
 				return;
 			}
 		if (BigBanks)
 			for (j = 256; j < 512; j++)
-				if (!ReadByte(&CHRbuffer[i][j]))
+				if (!ReadByte(CHRbuffer[i][j]))
 				{
 					EndDialog(bankWnd,FALSE);
 					return;
@@ -239,7 +239,7 @@ void	GetBanks (void)
 	for (i = 0; i < 10; i++)
 	{
 		for (j = 0; j < 32; j++)
-			if (!ReadByte(&PRGbuffer[i][j]))
+			if (!ReadByte(PRGbuffer[i][j]))
 			{
 				EndDialog(bankWnd,FALSE);
 				return;
@@ -249,7 +249,7 @@ void	GetBanks (void)
 		BankPercent(50 + 5 * i);
 	}
 
-	ReadByte(&mirror);
+	ReadByte(mirror);
 	CheckDlgButton(bankWnd,IDC_BANK_NT0,(mirror & 1) ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(bankWnd,IDC_BANK_NT1,(mirror & 2) ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(bankWnd,IDC_BANK_NT2,(mirror & 4) ? BST_CHECKED : BST_UNCHECKED);
@@ -257,7 +257,8 @@ void	GetBanks (void)
 
 	BankPercent(0);
 	RedrawBanks();
-	InitPort();
+	if (ParPort == -1)
+		InitPort();
 }
 
 INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -375,7 +376,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		{
 			BYTE data;	// don't use the global "Data", or it'll affect what's behind the editbox
 			char Info[64];
-			if (!WriteByte(0x02) || !WriteByte((BYTE)(Addr & 0xFF)) || !WriteByte((BYTE)(Addr >> 8)) || !ReadByte(&data))
+			if (!WriteByte(0x02) || !WriteByte((BYTE)(Addr & 0xFF)) || !WriteByte((BYTE)(Addr >> 8)) || !ReadByte(data))
 			{
 				EndDialog(hDlg,FALSE);
 				return FALSE;
@@ -417,6 +418,8 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		case IDC_BANK_RESET:
 		{
 			OpenStatus(hDlg);	// it's okay to attempt to re-open the dialog - it'll ignore it
+			if (ParPort != -1)
+				InitPort();
 			StatusText("Resetting CopyNES...");
 			ResetNES(RESET_COPYMODE);
 			StatusText("Loading plugin...");
@@ -498,7 +501,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			for (i = 0; i < DumpLen; i++)
 			{
 				BYTE a;
-				if (!ReadByte(&a))
+				if (!ReadByte(a))
 				{
 					CloseStatus();
 					EndDialog(hDlg,FALSE);
@@ -543,7 +546,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			OpenStatus(hDlg);
 
 			StatusText("Retrieving bank information...");
-			if (!WriteByte(0x09) || !ReadByte(&numbanks))
+			if (!WriteByte(0x09) || !ReadByte(numbanks))
 			{
 				CloseStatus();
 				EndDialog(hDlg,FALSE);
@@ -563,18 +566,18 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 				}
 				if (UseCRC)
 				{
-					DWORD n;
-					if (!ReadByte((BYTE *)&n + 0) || !ReadByte((BYTE *)&n + 1) || !ReadByte((BYTE *)&n + 2) || !ReadByte((BYTE *)&n + 3))
+					BYTE crc[4];
+					if (!ReadByte(crc[0]) || !ReadByte(crc[1]) || !ReadByte(crc[2]) || !ReadByte(crc[3]))
 					{
 						CloseStatus();
 						EndDialog(hDlg,FALSE);
 						return FALSE;
 					}
-					checksum = n;
+					checksum = (crc[0]) | (crc[1] << 8) | (crc[2] << 16) | (crc[3] << 24);
 					for (j = 0; j < 28; j++)
 					{
 						BYTE n;
-						if (!ReadByte(&n))
+						if (!ReadByte(n))
 						{
 							CloseStatus();
 							EndDialog(hDlg,FALSE);
@@ -587,7 +590,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 					for (j = 0; j < 32; j++)
 					{
 						BYTE n;
-						if (!ReadByte(&n))
+						if (!ReadByte(n))
 						{
 							CloseStatus();
 							EndDialog(hDlg,FALSE);
@@ -623,12 +626,14 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 			StatusText("Reading custom data from BankWatch plugin...");
 
-			if (!WriteByte(0x0B) || !ReadByte((BYTE *)&size) || !ReadByte((BYTE *)&size + 1) || !ReadByte((BYTE *)&size + 2))
+			BYTE s[3];
+			if (!WriteByte(0x0B) || !ReadByte(s[0]) || !ReadByte(s[1]) || !ReadByte(s[2]))
 			{
 				CloseStatus();
 				EndDialog(hDlg,FALSE);
 				return FALSE;
 			}
+			size = (s[0]) | (s[1] << 8) | (s[2] << 16);
 
 			StatusText("Downloading %i bytes...", size);
 
@@ -637,7 +642,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			for (i = 0; i < (signed)size; i++)
 			{
 				BYTE a;
-				if (!ReadByte(&a))
+				if (!ReadByte(a))
 				{
 					CloseStatus();
 					EndDialog(hDlg,FALSE);
@@ -704,6 +709,7 @@ BOOL	CMD_BANKWATCH (void)
 {
 	BOOL status;
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");

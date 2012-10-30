@@ -17,6 +17,7 @@ BOOL	UploadGAR (void)
 		return FALSE;
 	}
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading initialization plugin...");
@@ -75,6 +76,7 @@ BOOL	DownloadGAR (void)
 		return FALSE;
 	}
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading initialization plugin...");
@@ -100,7 +102,7 @@ BOOL	DownloadGAR (void)
 	for (i = 0; i < 0x800; i++)
 	{
 		BYTE n;
-		if (!ReadByte(&n))
+		if (!ReadByte(n))
 		{
 			fclose(GAR);
 			CloseStatus();

@@ -20,7 +20,6 @@ char	ROMstring[256];
 char	RxBuffer[64];
 char	TxBuffer[64];
 
-
 static int SystemVersion()
 {
 	OSVERSIONINFOEX osvi;
@@ -168,7 +167,7 @@ void	pwECP (unsigned char data)
 	Out32((unsigned short)(baseport+ecpoffset+0x2),data);
 }
 
-BOOL	ReadByteEx (BYTE *data, int timeout, BOOL warn)
+BOOL	ReadByteEx (BYTE &data, int timeout, BOOL warn)
 {
 	if (ParPort == -1)
 	{
@@ -180,7 +179,7 @@ BOOL	ReadByteEx (BYTE *data, int timeout, BOOL warn)
 			if (BytesReceived == 1)
 			{
 				// FT_Read OK
-				*data = RxBuffer[0];
+				data = RxBuffer[0];
 				return TRUE;
 			}
 			else
@@ -220,7 +219,7 @@ BOOL	ReadByteEx (BYTE *data, int timeout, BOOL warn)
 		a = prData();		// read data
 		shadow ^= 0x02;
 		pwControl(shadow);	// signal byte received
-		*data = a;
+		data = a;
 		return TRUE;
 	}
 }
@@ -281,13 +280,13 @@ BOOL	WriteByteEx (BYTE data, int timeout, BOOL warn)
 	}
 }
 
-BOOL WriteBlock (BYTE* blockdata, int size)
+BOOL WriteBlock (const BYTE* blockdata, int size)
 {
 	if (ParPort == -1)
 	{
 		DWORD BytesWritten = 0;
 		FT_SetTimeouts(ftHandleA,10000,0);
-		ftStatus = FT_Write(ftHandleA, blockdata, size, &BytesWritten);
+		ftStatus = FT_Write(ftHandleA, (LPVOID)blockdata, size, &BytesWritten);
 		if (ftStatus == FT_OK)
 		{ 
 			if (BytesWritten == size) 
@@ -323,7 +322,7 @@ BOOL WriteBlock (BYTE* blockdata, int size)
 	}
 }
 
-BOOL	ReadByte (BYTE *data)
+BOOL	ReadByte (BYTE &data)
 {
 	return ReadByteEx(data, 10, TRUE);
 }
@@ -332,7 +331,7 @@ BOOL	WriteByte (BYTE data)
 	return WriteByteEx(data, 10, TRUE);
 }
 
-BOOL	ReadByteSilent (BYTE *data)
+BOOL	ReadByteSilent (BYTE &data)
 {
 	return ReadByteEx(data, 10, FALSE);
 }
@@ -509,40 +508,30 @@ BOOL	WriteCommand (BYTE a, BYTE b, BYTE c, BYTE d, BYTE e)
 	}
 }
 
-BOOL	LoadPlugin (char *plugin)
+BOOL	LoadPlugin (const Plugin *plugin)
 {
-	int w;
-	char filename[MAX_PATH];
-	FILE *PLUGIN;
+	if (!WriteCommand(0x4B,0x00,0x04,0x04,0xB4))	// write to CPU space
+		return FALSE;
+	if (!WriteBlock(plugin->data,1024))
+		return FALSE;
+	StatusPercent(100);
+	strcpy(ROMstring, plugin->romstring.c_str());
+	StatusPercent(0);
+	Sleep(SLEEP_SHORT);
+	return TRUE;
+}
 
-	strcpy(filename,Path_PLUG);
-	strcat(filename,plugin);
-	if ((PLUGIN = fopen(filename,"rb")) == NULL)
+BOOL	LoadPlugin (const char *filename)
+{
+	Plugin *plugin = makePlugin("", filename, -1, "");
+	if (!plugin)
 	{
 		MessageBox(topHWnd,"Failed to open plugin file!","Dump",MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
-	if (!WriteCommand(0x4B,0x00,0x04,0x04,0xB4))	// write to CPU space
-	{	// failed to load plugin
-		fclose(PLUGIN);
-		return FALSE;
-	}
-	fseek(PLUGIN,128,SEEK_SET);
-	BYTE a[1024];
-	fread(&a,1024,1,PLUGIN);
-	if (!WriteBlock(a,1024))
-	{
-		fclose(PLUGIN);
-		return FALSE;
-	}
-	StatusPercent(100);
-	for (w = 0; !feof(PLUGIN); w++)
-		fread(&ROMstring[w],1,1,PLUGIN);
-	ROMstring[w] = 0;
-	fclose(PLUGIN);
-	StatusPercent(0);
-	Sleep(SLEEP_SHORT);
-	return TRUE;
+	BOOL result = LoadPlugin(plugin);
+	delete plugin;
+	return result;
 }
 
 BOOL	RunCode (void)

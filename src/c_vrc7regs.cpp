@@ -4,7 +4,7 @@
 
 static	BYTE	instdata[16][8];
 static	CHAR	filename[MAX_PATH];
-static	BYTE	inst, oct;
+static	BYTE	inst, octave;
 static	BOOL	changed;
 static	FILE	*data;
 
@@ -184,12 +184,12 @@ INT_PTR CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		SelectInstrument(hDlg, 1);
 		SendDlgItemMessage(hDlg, IDC_VRC7_INSTSLID, TBM_SETPOS, TRUE, inst);
 
-		oct = 0xC4;
-		SendDlgItemMessage(hDlg, IDC_VRC7_OCTSLID, TBM_SETPOS, TRUE, oct & 0x7);
-		SetDlgItemInt(hDlg, IDC_VRC7_OCTEDIT, oct & 0x7, FALSE);
+		octave = 0xC4;
+		SendDlgItemMessage(hDlg, IDC_VRC7_OCTSLID, TBM_SETPOS, TRUE, octave & 0x7);
+		SetDlgItemInt(hDlg, IDC_VRC7_OCTEDIT, octave & 0x7, FALSE);
 
-		CheckDlgButton(hDlg, IDC_VRC7_CUSTOM, (oct & 0x80) ? BST_CHECKED : BST_UNCHECKED);
-		CheckDlgButton(hDlg, IDC_VRC7_BUILTIN, (oct & 0x40) ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(hDlg, IDC_VRC7_CUSTOM, (octave & 0x80) ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(hDlg, IDC_VRC7_BUILTIN, (octave & 0x40) ? BST_CHECKED : BST_UNCHECKED);
 		changed = FALSE;
 
 		return TRUE;
@@ -199,14 +199,14 @@ INT_PTR CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam))
 		{
 		case IDC_VRC7_CUSTOM:
-			oct &= ~0x80;
+			octave &= ~0x80;
 			if (IsDlgButtonChecked(hDlg, IDC_VRC7_CUSTOM))
-				oct |= 0x80;
+				octave |= 0x80;
 			break;
 		case IDC_VRC7_BUILTIN:
-			oct &= ~0x40;
+			octave &= ~0x40;
 			if (IsDlgButtonChecked(hDlg, IDC_VRC7_BUILTIN))
-				oct |= 0x40;
+				octave |= 0x40;
 			break;
 
 		case IDC_VRC7_MTREMOLO:
@@ -232,7 +232,7 @@ INT_PTR CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			for (i = 0; i < 8; i++)
 				WriteByte(instdata[0][i]);
 			WriteByte(inst);
-			WriteByte(oct);
+			WriteByte(octave);
 			break;
 
 		case IDC_VRC7_STOP:
@@ -269,9 +269,9 @@ INT_PTR CALLBACK DLG_VRC7Tuner(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			SelectInstrument(hDlg, SendDlgItemMessage(hDlg, IDC_VRC7_INSTSLID, TBM_GETPOS, 0, 0));
 		else if ((HWND)lParam == GetDlgItem(hDlg,IDC_VRC7_OCTSLID))
 		{
-			oct &= 0xC0;
-			oct |= SendDlgItemMessage(hDlg, IDC_VRC7_OCTSLID, TBM_GETPOS, 0, 0);
-			SetDlgItemInt(hDlg, IDC_VRC7_OCTEDIT, (oct & 0x7), FALSE);
+			octave &= 0xC0;
+			octave |= SendDlgItemMessage(hDlg, IDC_VRC7_OCTSLID, TBM_GETPOS, 0, 0);
+			SetDlgItemInt(hDlg, IDC_VRC7_OCTEDIT, (octave & 0x7), FALSE);
 		}
 		else
 		{
@@ -309,6 +309,7 @@ BOOL	CMD_VRC7REGS (void)
 			fread(&instdata[i][j],1,1,data);
 
 	OpenStatus(topHWnd);
+	InitPort();
 	StatusText("Resetting CopyNES...");
 	ResetNES(RESET_COPYMODE);
 	StatusText("Loading plugin...");

@@ -169,7 +169,7 @@ BOOL	PromptLong (HWND hWnd)
 /* File prompt */
 
 static	OPENFILENAME	ofn;
-BOOL	PromptFile (HWND hWnd, char *Filter, char *FilePath, char *FileName, char *InitDir, char *Title, char *DefExt, BOOL Save)
+BOOL	PromptFile (HWND hWnd, const char *Filter, char *FilePath, char *FileName, const char *InitDir, const char *Title, const char *DefExt, BOOL Save)
 {
 	if (FilePath)
 		*FilePath = 0;
@@ -208,7 +208,7 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 {
 	static int curcat = 0, curplug = 0;
 	static int lastcat = 0, lastplug = 0;
-	static PCategory category;
+	static Category *category;
 	static int Type;
 	char desc[1024];
 
@@ -218,10 +218,10 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	case WM_INITDIALOG:
 		Type = (int)lParam;
 
-		for (i = 0; Plugins[i] != NULL; i++)
+		for (i = 0; i < Plugins.size(); i++)
 		{
 			if (Plugins[i]->type == Type)
-				SendDlgItemMessage(hDlg,IDC_PLUGIN_CATEGORY,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)Plugins[i]->desc);
+				SendDlgItemMessage(hDlg,IDC_PLUGIN_CATEGORY,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)Plugins[i]->desc.c_str());
 			else	SendDlgItemMessage(hDlg,IDC_PLUGIN_CATEGORY,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)"--------");
 		}
 
@@ -229,10 +229,10 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			i = 0;
 		else
 		{
-			for (i = 0; Plugins[i] != NULL; i++)
+			for (i = 0; i < Plugins.size(); i++)
 				if (Plugins[i]->type == Type)
 					break;
-			if (Plugins[i] == NULL)
+			if (i == Plugins.size())
 			{
 				MessageBox(hDlg, "Unable to locate category - please update MAPPERS.DAT!", "Plugin", MB_OK | MB_ICONERROR);
 				EndDialog(hDlg,(INT_PTR)NULL);
@@ -255,11 +255,11 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 		SendDlgItemMessage(hDlg,IDC_PLUGIN_CATEGORY,LB_SETCURSEL,curcat,0);
 
-		for (i = 0; category->list[i] != NULL; i++)
-			SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)category->list[i]->name);
+		for (i = 0; i < category->list.size(); i++)
+			SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)category->list[i]->name.c_str());
 
 		SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_SETCURSEL,curplug,0);
-		sprintf(desc, "%s (%i)", category->list[curplug]->desc, category->list[curplug]->num);
+		sprintf(desc, "%s (%i)", category->list[curplug]->desc.c_str(), category->list[curplug]->num);
 		SetDlgItemText(hDlg,IDC_PLUGIN_DESC,desc);
 
 		return TRUE;			break;
@@ -276,7 +276,7 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				while (Plugins[i]->type != PLUG_STD)
 				{	// switch to next category
 					i++;
-					if (Plugins[i] == NULL)
+					if (i == Plugins.size())
 						i = 0;
 				}
 				curcat = i;
@@ -284,16 +284,16 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				SendDlgItemMessage(hDlg,IDC_PLUGIN_CATEGORY,LB_SETCURSEL,curcat,0);	// update selection, in case it changed
 				SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_RESETCONTENT,0,0);
 				category = Plugins[curcat];
-				for (i = 0; category->list[i] != NULL; i++)
-					SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)category->list[i]->name);
+				for (i = 0; i < category->list.size(); i++)
+					SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)category->list[i]->name.c_str());
 				SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_SETCURSEL,curplug,0);
-				sprintf(desc, "%s (%i)", category->list[curplug]->desc, category->list[curplug]->num);
+				sprintf(desc, "%s (%i)", category->list[curplug]->desc.c_str(), category->list[curplug]->num);
 				SetDlgItemText(hDlg,IDC_PLUGIN_DESC,desc);
 			}
 			else if (LOWORD(wParam) == IDC_PLUGIN_LIST)
 			{
 				curplug = SendDlgItemMessage(hDlg,IDC_PLUGIN_LIST,LB_GETCURSEL,0,0);
-				sprintf(desc, "%s (%i)", category->list[curplug]->desc, category->list[curplug]->num);
+				sprintf(desc, "%s (%i)", category->list[curplug]->desc.c_str(), category->list[curplug]->num);
 				SetDlgItemText(hDlg,IDC_PLUGIN_DESC,desc);
 			}
 		}
@@ -322,15 +322,12 @@ INT_PTR CALLBACK DLG_SelectPlugin(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
-static char custplug_name[1024] = "CUSTOM";
-static char custplug_file[1024] = "custom.bin";
-static char custplug_desc[1024] = "User-Defined Mapper";
-static TPlugin custplug = {custplug_name, custplug_file, 998, custplug_desc};
-
-PPlugin	PromptPlugin (int Type)
+static Plugin custplug;
+Plugin*	PromptPlugin (plugin_type Type)
 {
-	char filepath[MAX_PATH];
-	PPlugin result = (PPlugin)DialogBoxParam(hInst,MAKEINTRESOURCE(IDD_SELECTPLUGIN),topHWnd,DLG_SelectPlugin,(LPARAM)Type);
+	char filepath[MAX_PATH], filename[MAX_PATH];
+
+	Plugin *result = (Plugin *)DialogBoxParam(hInst,MAKEINTRESOURCE(IDD_SELECTPLUGIN),topHWnd,DLG_SelectPlugin,(LPARAM)Type);
 	if (result == NULL)
 		return NULL;
 
@@ -346,18 +343,23 @@ PPlugin	PromptPlugin (int Type)
 	{
 		PromptTitle = "Specify UNIF board name (cancel for none):";
 		if (Prompt(topHWnd))
-			strcpy(custplug.name,PromptResult);
+			custplug.name = PromptResult;
 		else if (custplug.num == -1)
 			custplug.num = 999;
 	}
 
 	while (1)
 	{
-		if (!PromptFile(topHWnd,"CopyNES Plugins (*.bin)\0*.bin\0\0\0\0", filepath, custplug.file, Path_PLUG, "Select a plugin (must be in Plugins path)", "bin", FALSE))
+		if (!PromptFile(topHWnd,"CopyNES Plugins (*.bin)\0*.bin\0\0\0\0", filepath, filename, Path_PLUG, "Select a plugin (must be in Plugins path)", "bin", FALSE))
 			return NULL;
-		if (strnicmp(Path_PLUG, filepath, strlen(Path_PLUG)))
-			MessageBox(topHWnd,"Selected file is not located in Plugins directory!","Select Plugin", MB_OK | MB_ICONERROR);
-		else	break;
+		Plugin *plugin = makePlugin(custplug.name.c_str(), filepath, custplug.num, result->desc.c_str());
+		if (plugin)
+		{
+			custplug = *plugin;
+			delete plugin;
+			break;
+		}
+		MessageBox(topHWnd,"Selected plugin is not valid!","Select Plugin", MB_OK | MB_ICONERROR);
 	}
 	return &custplug;
 }

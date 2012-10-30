@@ -10,13 +10,12 @@ BOOL	CMD_MAKEUNIF (void)
 	int battery, mirror = 0, fourscrn = 0, mcon = 0;
 	char filepath[MAX_PATH], filename[MAX_PATH];
 
-	PPlugin plugin = PromptPlugin(PLUG_STD);
+	Plugin *plugin = PromptPlugin(PLUG_STD);
 	if (plugin == NULL)
 		return FALSE;
 
 	if (!PromptFile(topHWnd,"PRG data (*.PRG)\0*.prg\0\0",filepath,filename,NULL,"Select PRG segment","prg",FALSE))
 		return FALSE;
-
 
 	mirror = (MessageBox(topHWnd,"Vertical mirroring?",MSGBOX_TITLE,MB_YESNO | MB_ICONQUESTION) == IDYES);
 	fourscrn = (MessageBox(topHWnd,"4-screen VRAM?",MSGBOX_TITLE,MB_YESNO | MB_ICONQUESTION) == IDYES);
@@ -44,7 +43,7 @@ BOOL	CMD_MAKEUNIF (void)
 	strcpy(Path_CHR,filepath);
 	strcpy(Path_NES,filepath);
 
-	WriteUNIF(filename, plugin->name, battery, mirror, fourscrn, mcon);
+	WriteUNIF(filename, plugin->name.c_str(), battery, mirror, fourscrn, mcon);
 
 	strcpy(Path_PRG,PRGback);
 	strcpy(Path_CHR,CHRback);
