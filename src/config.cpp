@@ -219,6 +219,7 @@ Plugin *makePlugin (const char *name, const char *filename, int num, const char 
 		fclose(in);
 		return NULL;
 	}
+	fseek(in, 0, SEEK_SET);
 	Plugin *plugin = new Plugin;
 	plugin->name = name;
 	plugin->desc = desc;
