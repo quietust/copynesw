@@ -98,11 +98,8 @@ void	GetConfig (void)
 			ParAddr = 0xE800;
 		if (ParPort > 4)
 			ParPort = 4;
-		WriteConfig();
-	}
-	if ((ParAddr > 0) && (ParECP == 0))
-	{
-		ParECP = 0x400;
+		if (ParECP == 0)
+			ParECP = 0x400;
 		WriteConfig();
 	}
 }

@@ -158,11 +158,15 @@ unsigned char	prECP (void)
 {
 	if (!baseport)
 		return 0;
+	if (!ecpoffset)
+		return 0;
 	return (unsigned char)Inp32((unsigned short)(baseport+ecpoffset+0x2));
 }
 void	pwECP (unsigned char data)
 {
 	if (!baseport)
+		return;
+	if (!ecpoffset)
 		return;
 	Out32((unsigned short)(baseport+ecpoffset+0x2),data);
 }
@@ -414,7 +418,7 @@ void	InitPort (void)
 	}
 	else
 	{
-		if ((prECP() & 0x03) == 0x01)
+		if (ecpoffset)
 		{
 			pwECP(0x34);
 			if (prECP() == 0x35)
