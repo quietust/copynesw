@@ -13,6 +13,12 @@ BOOL	CMD_WRITEWRAM (void)
 		return FALSE;
 	if (!PromptFile(topHWnd,"SaveRAM files (*.SAV)\0*.sav\0\0",filename,NULL,Path_WRAM,"Select an SRAM file","sav",FALSE))
 		return FALSE;
+	WRAM = fopen(filename,"rb");
+	if (!WRAM)
+	{
+		MessageBox(topHWnd,"Unable to open SRAM file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
+		return FALSE;
+	}
 	OpenStatus(topHWnd);
 	InitPort();
 	StatusText("Resetting CopyNES...");
@@ -21,12 +27,12 @@ BOOL	CMD_WRITEWRAM (void)
 	StatusText("Loading plugin...");
 	if (!LoadPlugin(plugin))
 	{
+		fclose(WRAM);
 		CloseStatus();
 		return FALSE;
 	}
 	StatusText("Initializing plugin...");
 	RunCode();
-	WRAM = fopen(filename,"rb");
 	fseek(WRAM,0,SEEK_END);
 	wramsize = ftell(WRAM);
 	StatusText("Uploading WRAM...");

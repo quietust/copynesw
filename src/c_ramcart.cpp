@@ -25,6 +25,7 @@ BOOL	NRAMcart (Plugin *plugin)
 	fread(header,1,16,NES);
 	if (memcmp(header,"NES\x1A",4))
 	{
+		fclose(NES);
 		StatusText("Selected file is not an iNES ROM image!");
 		StatusOK();
 		return FALSE;
@@ -56,6 +57,7 @@ BOOL	NRAMcart (Plugin *plugin)
 	mapper = ((header[6] & 0xF0) >> 4) | (header[7] & 0xF0);
 	if ((mapper != 0) && (MessageBox(topHWnd,"Incorrect iNES mapper detected! Load anyways?",MSGBOX_TITLE,MB_YESNO | MB_ICONQUESTION) == IDNO))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -70,6 +72,7 @@ BOOL	NRAMcart (Plugin *plugin)
 	StatusText("Loading plugin...");
 	if (!LoadPlugin(plugin))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -78,6 +81,7 @@ BOOL	NRAMcart (Plugin *plugin)
 	Sleep(SLEEP_SHORT);
 	if (!WriteByte(PRGamt))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -88,6 +92,7 @@ BOOL	NRAMcart (Plugin *plugin)
 		fread(&a,1024,1,NES);
 		if (!WriteBlock(a, 1024))
 		{
+			fclose(NES);
 			CloseStatus();
 			return FALSE;
 		}
@@ -102,6 +107,7 @@ BOOL	NRAMcart (Plugin *plugin)
 			fread(&a,1024,1,NES);
 		if (!WriteBlock(a, 1024))
 		{
+			fclose(NES);
 			CloseStatus();
 			return FALSE;
 		}
@@ -139,6 +145,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 	fread(header,1,16,NES);
 	if (memcmp(header,"NES\x1A",4))
 	{
+		fclose(NES);
 		StatusText("Selected file is not an iNES ROM image!");
 		StatusOK();
 		return FALSE;
@@ -170,6 +177,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 
 	if ((mapper != 0) && (mapper != 3) && (MessageBox(topHWnd,"Incorrect iNES mapper detected! Load anyways?",MSGBOX_TITLE,MB_YESNO | MB_ICONQUESTION) == IDNO))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -183,6 +191,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 	StatusText("Loading plugin...");
 	if (!LoadPlugin(plugin))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -194,6 +203,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 	fseek(NES,0x10 + header[4] * 16384,SEEK_SET);
 	if (!WriteByte(header[5]))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -204,6 +214,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 		fread(&a,1024,1,NES);
 		if (!WriteBlock(a, 1024))
 		{
+			fclose(NES);
 			CloseStatus();
 			return FALSE;
 		}
@@ -215,6 +226,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 	StatusText("Sending PRG data...");
 	if (!WriteByte(header[4]))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -224,6 +236,7 @@ BOOL	CNRAMcart (Plugin *plugin)
 		fread(&a,1024,1,NES);
 		if (!WriteBlock(a, 1024))
 		{
+			fclose(NES);
 			CloseStatus();
 			return FALSE;
 		}
@@ -402,6 +415,7 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 	fread(header,1,16,NES);
 	if (memcmp(header,"NES\x1A",4))
 	{
+		fclose(NES);
 		StatusText("Selected file is not an iNES ROM image!");
 		StatusOK();
 		return FALSE;
@@ -412,6 +426,7 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 		(mapper != 7) && (mapper != 11) && (mapper != 34) && (mapper != 66) && 
 		(MessageBox(topHWnd,"Incorrect iNES mapper detected! Load anyways?",MSGBOX_TITLE,MB_YESNO | MB_ICONQUESTION) == IDNO))
 	{
+		fclose(NES);
 		CloseStatus();
 		return FALSE;
 	}
@@ -484,8 +499,8 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 	StatusText("Loading plugin...");
 	if (!LoadPlugin(plugin))
 	{
-		CloseStatus();
 		fclose(NES);
+		CloseStatus();
 		return FALSE;
 	}
 	StatusText("Initializing plugin...");
@@ -495,8 +510,8 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 	StatusText("Sending PRG data...");
 	if (!WriteByte(header[4]))
 	{
-		CloseStatus();
 		fclose(NES);
+		CloseStatus();
 		return FALSE;
 	}
 	fseek(NES,0x10,SEEK_SET);
@@ -508,8 +523,8 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 		fread(a, 1024, 1, NES);
 		if (!WriteBlock(a, 1024))
 		{
-			CloseStatus();
 			fclose(NES);
+			CloseStatus();
 			return FALSE;
 		}
 		StatusPercent((i * 100) / (header[4] * 16));
@@ -521,8 +536,8 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 	fseek(NES,0x10 + header[4] * 16384,SEEK_SET);
 	if (!WriteByte(header[5]))
 	{
-		CloseStatus();
 		fclose(NES);
+		CloseStatus();
 		return FALSE;
 	}
 
@@ -531,8 +546,8 @@ BOOL	PowerPakLitecart (Plugin *plugin)
 		fread(a, 1024, 1, NES);
 		if (!WriteBlock(a, 1024))
 		{
-			CloseStatus();
 			fclose(NES);
+			CloseStatus();
 			return FALSE;
 		}
 		StatusPercent((i * 100) / (header[5] * 8));
@@ -679,8 +694,8 @@ BOOL	PowerPakcart (Plugin *plugin)
 			fread(a, 1024, 1, NES);
 			if (!WriteBlock(a, 1024))
 			{
-				CloseStatus();
 				fclose(NES);
+				CloseStatus();
 				return FALSE;
 			}
 			StatusPercent(((i*64 + j) * 100) / 256);  
@@ -803,8 +818,8 @@ BOOL	Glidercart (Plugin *plugin)
 
 			if (!WriteBlock(a, 1024))
 			{
-				CloseStatus();
 				fclose(NES);
+				CloseStatus();
 				return FALSE;
 			}
 			StatusPercent(((i*64 + j) * 100) / 256);  

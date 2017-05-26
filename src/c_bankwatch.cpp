@@ -488,15 +488,21 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			int i;
 			if (!PromptFile(topHWnd,"Binary file(*.BIN)\0*.bin\0\0",filename,NULL,NULL,"Save data as?","bin",TRUE))
 				break;
+			DUMP = fopen(filename,"wb");
+			if (!DUMP)
+			{
+				MessageBox(topHWnd,"Failed to create output file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
+				break;
+			}
 			OpenStatus(hDlg);
 			StatusText("Dumping data from $%04X-$%04X (%04X bytes)", DumpFrom, DumpTo, DumpLen);
 			if (!WriteByte(0x05) || !WriteByte((BYTE)(DumpFrom & 0xFF)) || !WriteByte((BYTE)(DumpFrom >> 8)) || !WriteByte((BYTE)(DumpLen & 0xFF)) || !WriteByte((BYTE)(DumpLen >> 8)))
 			{
+				fclose(DUMP);
 				CloseStatus();
 				EndDialog(hDlg,FALSE);
 				return FALSE;
 			}
-			DUMP = fopen(filename,"wb");
 			StatusPercent(0);
 			for (i = 0; i < DumpLen; i++)
 			{
@@ -623,6 +629,11 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 			if (!PromptFile(topHWnd,"Binary file(*.BIN)\0*.bin\0\0",filename,NULL,NULL,"Save data as?","bin",TRUE))
 				break;
+			if (!DUMP)
+			{
+				MessageBox(topHWnd,"Failed to create output file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
+				break;
+			}
 			OpenStatus(hDlg);
 
 			StatusText("Reading custom data from BankWatch plugin...");
@@ -630,6 +641,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			BYTE s[3];
 			if (!WriteByte(0x0B) || !ReadByte(s[0]) || !ReadByte(s[1]) || !ReadByte(s[2]))
 			{
+				fclose(DUMP);
 				CloseStatus();
 				EndDialog(hDlg,FALSE);
 				return FALSE;
@@ -645,6 +657,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 				BYTE a;
 				if (!ReadByte(a))
 				{
+					fclose(DUMP);
 					CloseStatus();
 					EndDialog(hDlg,FALSE);
 					return FALSE;

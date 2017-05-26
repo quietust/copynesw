@@ -315,6 +315,7 @@ BOOL	CMD_VRC7REGS (void)
 	StatusText("Loading plugin...");
 	if (!LoadPlugin("regtest.bin"))
 	{
+		fclose(data);
 		CloseStatus();
 		return FALSE;
 	}
@@ -322,6 +323,7 @@ BOOL	CMD_VRC7REGS (void)
 	StatusText("Initializing plugin...");
 	if (!RunCode())
 	{
+		fclose(data);
 		CloseStatus();
 		return FALSE;
 	}

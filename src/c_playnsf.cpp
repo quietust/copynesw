@@ -28,7 +28,6 @@ INT_PTR CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 			NSF_cursong--;
 			if (NSF_cursong < 1)
 				NSF_cursong = NSF_totalsongs;
-			SetDlgItemInt(hDlg,IDC_NSF_CURSONG,NSF_cursong,FALSE);
 			// counteract the following increment...
 			NSF_cursong--;
 			// ...and fall through
@@ -37,6 +36,7 @@ INT_PTR CALLBACK DLG_PlayNSF(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 			if (NSF_cursong > NSF_totalsongs)
 				NSF_cursong = 1;
 			SetDlgItemInt(hDlg,IDC_NSF_CURSONG,NSF_cursong,FALSE);
+			// ...and fall through again to play the selected song
 		case IDC_NSF_REPLAY:
 	/* FIXME: find out why this code breaks after running once */
 			if (ParPort != -1)
@@ -80,7 +80,7 @@ BOOL	LoadNSF (char *filename)
 	NSF = fopen(filename,"rb");
 	if (NSF == NULL)
 	{
-		MessageBox(topHWnd,"Unable to open file!",MSGBOX_TITLE,MB_OK);
+		MessageBox(topHWnd,"Unable to open file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
 
@@ -92,18 +92,25 @@ BOOL	LoadNSF (char *filename)
 	StatusText("Setting CopyNES to NSF player mode...");
 	if (!WriteByte(0x8E))
 	{
+		fclose(NSF);
 		CloseStatus();
 		return FALSE;
 	}
 
 	if (fread(header,1,128,NSF) != 128)
+	{
+		fclose(NSF);
+		MessageBox(topHWnd,"Error! Failed to read NSF header!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
+		CloseStatus();
 		return FALSE;
+	}
 
 	StatusText("Uploading NSF header...");
 
 	if (!WriteByte(header[0x8]) || !WriteByte(header[0x9]) || !WriteByte(header[0xA]) ||
 		!WriteByte(header[0xB]) || !WriteByte(header[0xC]) || !WriteByte(header[0xD]))
 	{
+		fclose(NSF);
 		CloseStatus();
 		return FALSE;
 	}
@@ -112,6 +119,7 @@ BOOL	LoadNSF (char *filename)
 	nbytes = ftell(NSF) - 128;
 	if (!WriteByte((BYTE)(nbytes >> 0)) || !WriteByte((BYTE)(nbytes >> 8)) || !WriteByte((BYTE)(nbytes >> 16)))
 	{
+		fclose(NSF);
 		CloseStatus();
 		return FALSE;
 	}
@@ -123,12 +131,14 @@ BOOL	LoadNSF (char *filename)
 	{
 		if (!WriteByte(NSF_banks[i] = header[0x70 | i]))
 		{
+			fclose(NSF);
 			CloseStatus();
 			return FALSE;
 		}
 	}
 	if (!WriteByte(NSF_totalsongs = header[0x6]) || !WriteByte(NSF_cursong = header[0x7]))
 	{
+		fclose(NSF);
 		CloseStatus();
 		return FALSE;
 	}
@@ -142,12 +152,14 @@ BOOL	LoadNSF (char *filename)
 		{
 			if (fread(&r,1024,1,NSF) == 0)
 			{
-				MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK);
+				fclose(NSF);
+				MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
 				CloseStatus();
 				return FALSE;
 			}
 			if (!WriteBlock(r, 1024))
 			{
+				fclose(NSF);
 				CloseStatus();
 				return FALSE;
 			}
@@ -158,12 +170,14 @@ BOOL	LoadNSF (char *filename)
 	{
 		if (fread(&r,nrem,1,NSF) == 0)
 		{
-			MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK);
+			fclose(NSF);
+			MessageBox(topHWnd,"Error! Failed to read NSF data!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
 			CloseStatus();
 			return FALSE;
 		}
 		if (!WriteBlock(r, nrem))
 		{
+			fclose(NSF);
 			CloseStatus();
 			return FALSE;
 		}

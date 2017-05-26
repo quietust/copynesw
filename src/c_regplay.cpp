@@ -40,6 +40,7 @@ BOOL	RegPlayNES (char *filename)
 			sscanf(data,"Write:  %04X:%02X\n",&Addr,&Val);
 			if (!WriteByte((BYTE)(0x80 | ((Val & 0x80) >> 1) | (Addr & 0x1F))) || !WriteByte((BYTE)(Val & 0x7F)))
 			{
+				fclose(REGDATA);
 				CloseStatus();
 				return FALSE;
 			}
@@ -50,17 +51,18 @@ BOOL	RegPlayNES (char *filename)
 			StatusPercent((FrameNum*100)/NumFrames);
 			if (!WriteByte(0xFF))
 			{
+				fclose(REGDATA);
 				CloseStatus();
 				return FALSE;
 			}
 		}
 	}
+	fclose(REGDATA);
 	if (!WriteByte(0x95) && !WriteByte(0x00))
 	{
 		CloseStatus();
 		return FALSE;
 	}
-	fclose(REGDATA);
 	StatusPercent(100);
 	StatusText("...done!");
 	StatusOK();
@@ -106,6 +108,7 @@ BOOL	RegPlayVRC7 (char *filename)
 			sscanf(data,"90%02X  %02X\n",&Addr,&Val);
 			if (!WriteByte((BYTE)(0x80 | ((Val & 0x80) >> 1) | (Addr & 0x1F))) || !WriteByte((BYTE)(Val & 0x7F)))
 			{
+				fclose(REGDATA);
 				CloseStatus();
 				return FALSE;
 			}
@@ -117,12 +120,12 @@ BOOL	RegPlayVRC7 (char *filename)
 			Sleep(16);	// wait about a frame or so
 		}
 	}
+	fclose(REGDATA);
 	if (!WriteByte(0x95) && !WriteByte(0x00))
 	{
 		CloseStatus();
 		return FALSE;
 	}
-	fclose(REGDATA);
 	StatusPercent(100);
 	StatusText("...done!");
 	StatusOK();

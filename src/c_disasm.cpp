@@ -67,7 +67,10 @@ BOOL	CMD_DISASM (void)
 		sscanf(PromptResult,"%i",&pc);
 
 	if (!PromptFile(topHWnd,"Disassembly (*.ASM)\0*.asm\0\0",filename,NULL,NULL,"Enter filename for disassembly output","asm",TRUE))
+	{
+		fclose(BIN);
 		return FALSE;
+	}
 
 	ASM = fopen(filename,"wb");
 	if (!ASM)

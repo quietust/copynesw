@@ -53,10 +53,20 @@ BOOL	CMD_DUMPCART (void)
 	Sleep(SLEEP_LONG);
 
 	if (SaveCRC)
+	{
 		CRC = fopen((string(Path_CRC) + filename + ".txt").c_str(),"wb");
+		if (CRC == NULL)
+		{
+			MessageBox(topHWnd,"Unable to create CRC output file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
+			CloseStatus();
+			return FALSE;
+		}
+	}
 	
 	if (!ReadByte(cmode))		// mirroring
 	{
+		if (SaveCRC)
+			fclose(CRC);
 		CloseStatus();
 		return FALSE;
 	}
@@ -68,6 +78,8 @@ BOOL	CMD_DUMPCART (void)
 		BYTE n[2];
 		if (!ReadByteEx(n[0],15,TRUE) || !ReadByte(n[1]))
 		{
+			if (SaveCRC)
+				fclose(CRC);
 			CloseStatus();
 			return FALSE;
 		}
@@ -76,6 +88,8 @@ BOOL	CMD_DUMPCART (void)
 		numk = bytes / 1024;
 		if (!ReadByte(ctype))
 		{
+			if (SaveCRC)
+				fclose(CRC);
 			CloseStatus();
 			return FALSE;
 		}
@@ -95,7 +109,10 @@ BOOL	CMD_DUMPCART (void)
 			battery = 1;					break;
 		case 4:	rbyte = nblks / 4;
 			continue;
-		default:StatusText("Unknown block type %i! Aborting...",ctype);
+		default:
+			if (SaveCRC)
+				fclose(CRC);
+			StatusText("Unknown block type %i! Aborting...",ctype);
 			StatusOK();
 			return FALSE;					break;
 		}
@@ -103,7 +120,9 @@ BOOL	CMD_DUMPCART (void)
 		DATA = fopen((string(path) + filename + ext).c_str(),"w+b");
 		if (DATA == NULL)
 		{
-			StatusText("Unable to open output file!");
+			if (SaveCRC)
+				fclose(CRC);
+			MessageBox(topHWnd,"Unable to create output file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
 			StatusOK();
 			return FALSE;
 		}
@@ -115,6 +134,9 @@ BOOL	CMD_DUMPCART (void)
 			{
 				if (!ReadByte(n))
 				{
+					if (SaveCRC)
+						fclose(CRC);
+					fclose(DATA);
 					CloseStatus();
 					return FALSE;
 				}
@@ -136,6 +158,9 @@ BOOL	CMD_DUMPCART (void)
 					BYTE n[2];
 					if (!ReadByte(n[0]) || !ReadByte(n[1]))
 					{
+						if (SaveCRC)
+							fclose(CRC);
+						fclose(DATA);
 						CloseStatus();
 						return FALSE;
 					}

@@ -33,6 +33,7 @@ BOOL	CMD_BREAKBANK (void)
 	fseek(input,0,SEEK_END);
 	if (ftell(input) % banksize)
 	{
+		fclose(input);
 		StatusText("Irregular file size!");
 		StatusOK();
 		return FALSE;
