@@ -629,6 +629,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 			if (!PromptFile(topHWnd,"Binary file(*.BIN)\0*.bin\0\0",filename,NULL,NULL,"Save data as?","bin",TRUE))
 				break;
+			DUMP = fopen(filename,"wb");
 			if (!DUMP)
 			{
 				MessageBox(topHWnd,"Failed to create output file!",MSGBOX_TITLE,MB_OK | MB_ICONERROR);
@@ -650,7 +651,6 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 			StatusText("Downloading %i bytes...", size);
 
-			DUMP = fopen(filename,"wb");
 			StatusPercent(0);
 			for (i = 0; i < (signed)size; i++)
 			{
