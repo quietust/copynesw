@@ -503,6 +503,7 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 				BYTE a;
 				if (!ReadByte(a))
 				{
+					fclose(DUMP);
 					CloseStatus();
 					EndDialog(hDlg,FALSE);
 					return FALSE;
@@ -511,11 +512,11 @@ INT_PTR CALLBACK DLG_BankWatch(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 				if (!(i & 7))
 					StatusPercent(100 * i / DumpLen);
 			}
+			fclose(DUMP);
 			InitPort();
 			StatusPercent(100);
 			StatusText("Data dumped successfully!");
 			StatusOK();
-			fclose(DUMP);
 		}	break;
 
 		case IDC_BANK_HISTORY:
